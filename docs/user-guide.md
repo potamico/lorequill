@@ -45,7 +45,7 @@ site: # optional: the published site, for stable links
   stable_links: { field: id, path: "id/{value}/" }
 
 checks:
-  engine_version: 0.2.0 # the engine that CI runs, optional
+  engine_version: 0.3.0 # the engine that CI runs, optional
   rules:
     - { id: links, rule: relative-links, slugify: unicode }
     - { id: no-wikilinks, rule: forbidden-text, text: "[[" }

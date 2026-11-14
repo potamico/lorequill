@@ -2,7 +2,7 @@
   "name": "vscode-lorequill",
   "displayName": "Lorequill – Structured Knowledge Documentation",
   "description": "Structured Knowledge Documentation for Visual Studio Code",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "potamico",
   "icon": "resources/icon.png",
   "private": true,
@@ -687,11 +687,11 @@
     "mocha": "12.0.3"
   },
   "dependencies": {
-    "@lorequill/checks": "0.2.0",
-    "@lorequill/editor": "0.2.0",
-    "@lorequill/markdown": "0.2.0",
-    "@lorequill/profile": "0.2.0",
-    "@lorequill/server": "0.2.0",
+    "@lorequill/checks": "0.3.0",
+    "@lorequill/editor": "0.3.0",
+    "@lorequill/markdown": "0.3.0",
+    "@lorequill/profile": "0.3.0",
+    "@lorequill/server": "0.3.0",
     "vscode-languageclient": "11.0.0"
   }
 }

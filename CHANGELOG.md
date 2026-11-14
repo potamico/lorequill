@@ -7,6 +7,8 @@ the check engine, the CLI, and the GitHub Action. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-14
+
 ### Added
 
 - Documentation site at <https://lorequill.potamico.org/>, built from `docs/`, with getting started
@@ -75,5 +77,6 @@ identifier `potamico.vscode-lorequill`.
 - User guide, specification, decisions, privacy notice, release procedure, and acceptance
   traceability.
 
-[Unreleased]: https://github.com/potamico/lorequill/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/potamico/lorequill/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/potamico/lorequill/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/potamico/lorequill/releases/tag/v0.2.0
