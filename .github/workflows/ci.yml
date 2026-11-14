@@ -98,6 +98,28 @@ jobs:
           test "$ENGINE_VERSION" = "$expected"
           test "$STATUS" = "passed"
           test -s lorequill.sarif
+      # Lorequill checks its own documentation with the root profile (.lorequill/config.yaml).
+      - name: Check the documentation
+        uses: ./action
+
+  docs:
+    name: Documentation site
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NO_MKDOCS_2_WARNING: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: docs/requirements.txt
+      - run: pip install -r docs/requirements.txt
+      # Fails on broken links, missing anchors, and pages missing from the navigation.
+      - run: mkdocs build --strict
 
   package:
     name: Package VSIX
@@ -148,7 +170,7 @@ jobs:
   ci-passed:
     name: CI passed
     if: always()
-    needs: [verify, integration, action, package, audit]
+    needs: [verify, integration, action, docs, package, audit]
     runs-on: ubuntu-latest
     steps:
       - name: Check the results of all jobs

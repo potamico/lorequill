@@ -49,3 +49,18 @@ updates:
     groups:
       github-actions:
         patterns: ["*"]
+
+  # Python packages of the documentation site and of the MkDocs example.
+  - package-ecosystem: pip
+    directories: [/docs, /docs/examples/mkdocs]
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+    labels: [dependencies]
+    commit-message:
+      prefix: "chore(docs)"
+    groups:
+      python:
+        patterns: ["*"]

@@ -37,4 +37,4 @@ if your workflow does so.
 the subjects of the submitted commits. The pull request is subject to your Git host's terms and
 privacy policy.
 
-Questions or concerns: see [`SECURITY.md`](../SECURITY.md) for private reports, or open an issue.
+Questions or concerns: see the [security policy](https://github.com/potamico/lorequill/security/policy) for private reports, or open an issue.

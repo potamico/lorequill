@@ -222,16 +222,36 @@ npm run generate:types --workspace @lorequill/profile
   `NODE_USE_ENV_PROXY=1` (Node 24 or later), so that Node's `fetch` uses `HTTPS_PROXY` as Git
   does.
 
+## Documentation site
+
+The documentation in `docs/` is published at <https://lorequill.potamico.org/> with MkDocs and
+Material for MkDocs (`mkdocs.yml`). The developer documents (specification, decisions, this guide,
+release procedure, acceptance) stay in the repository and are excluded from the site. Lorequill
+checks `docs/` with the root profile `.lorequill/config.yaml`, in the editor and in CI.
+
+To preview the site locally:
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r docs/requirements.txt
+.venv/bin/mkdocs serve
+```
+
+`mkdocs build --strict` fails on broken links, missing anchors, and pages missing from the
+navigation, as CI does. A new page needs an entry in `nav` of `mkdocs.yml`, or an entry in
+`exclude_docs` if it is a developer document.
+
 ## Continuous integration and repository security
 
 Workflows live in `.github/workflows/`. They only use GitHub-provided services and no secrets.
 
-| Workflow                | Runs on                               | Purpose                                                                                                                                                                                                                  |
-| ----------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `ci.yml`                | push to `main`, pull requests         | `Verify` (`npm run verify`) on Linux, Windows, macOS with the current Node.js LTS and on Linux with Node.js 22; `Extension host tests` on all three systems; `Audit runtime dependencies`; aggregate job **`CI passed`** |
-| `codeql.yml`            | push to `main`, pull requests, weekly | CodeQL code scanning for JavaScript/TypeScript and for the workflow files                                                                                                                                                |
-| `dependency-review.yml` | pull requests                         | Fails when a pull request adds a runtime dependency with a known vulnerability (moderate or higher) or with a GPL, AGPL, or SSPL license                                                                                 |
-| `dependabot.yml`        | weekly (Monday)                       | Grouped update pull requests for npm packages and GitHub Actions, with a seven-day cooldown for new releases                                                                                                             |
+| Workflow                | Runs on                                | Purpose                                                                                                                                                                                                                                                                                                                              |
+| ----------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ci.yml`                | push to `main`, pull requests          | `Verify` (`npm run verify`) on Linux, Windows, macOS with the current Node.js LTS and on Linux with Node.js 22; `Extension host tests` on all three systems; `Checks Action` on the demo and on `docs/`; `Documentation site` (`mkdocs build --strict`); `Package VSIX`; `Audit runtime dependencies`; aggregate job **`CI passed`** |
+| `docs.yml`              | push to `main` (documentation), manual | Builds the documentation site and deploys it to GitHub Pages                                                                                                                                                                                                                                                                         |
+| `codeql.yml`            | push to `main`, pull requests, weekly  | CodeQL code scanning for JavaScript/TypeScript and for the workflow files                                                                                                                                                                                                                                                            |
+| `dependency-review.yml` | pull requests                          | Fails when a pull request adds a runtime dependency with a known vulnerability (moderate or higher) or with a GPL, AGPL, or SSPL license                                                                                                                                                                                             |
+| `dependabot.yml`        | weekly (Monday)                        | Grouped update pull requests for npm packages, GitHub Actions, and the Python packages of the documentation, with a seven-day cooldown for new releases                                                                                                                                                                              |
 
 `.gitattributes` forces LF line endings so Prettier and the byte-exact fixtures behave the same on
 Windows runners.
@@ -249,6 +269,9 @@ Windows runners.
   `codeql.yml` and `dependency-review.yml` fail.
 - **Actions permissions:** allow actions and reusable workflows from GitHub only (the workflows use
   `actions/*`, `github/codeql-action`) and set the default `GITHUB_TOKEN` permission to read-only.
+- **Pages:** source "GitHub Actions", custom domain `lorequill.potamico.org` with HTTPS enforced,
+  and the domain verified for the account or organization. The DNS of `potamico.org` has a
+  `CNAME` record `lorequill` pointing to `potamico.github.io`.
 
 ### Updating pinned actions
 

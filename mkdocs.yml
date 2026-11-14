@@ -1,0 +1,73 @@
+# The documentation site, published at https://lorequill.potamico.org/ by .github/workflows/docs.yml.
+# The developer documents in docs/ stay in the repository and are not part of the site.
+site_name: Lorequill
+site_description: Structured knowledge documentation for Visual Studio Code
+site_url: https://lorequill.potamico.org/
+repo_url: https://github.com/potamico/lorequill
+repo_name: potamico/lorequill
+edit_uri: edit/main/docs/
+copyright: Lorequill is licensed under the Apache License 2.0.
+
+docs_dir: docs
+exclude_docs: |
+  /specification.md
+  /decisions.md
+  /development.md
+  /release.md
+  /acceptance.md
+  /requirements.txt
+  __pycache__/
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - User guide:
+      - user-guide.md
+      - Commit, submit, and Git hooks: git-workflow.md
+  - Reference:
+      - Profile: reference/profile.md
+      - Checks: reference/checks.md
+      - CI with GitHub Actions: reference/ci.md
+  - Examples:
+      - Stable links with MkDocs: examples/mkdocs/README.md
+      - EA Body of Knowledge profile: examples/ea-body-of-knowledge.md
+  - Privacy: privacy.md
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - content.action.edit
+    - search.highlight
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle: { icon: material/brightness-7, name: Switch to dark mode }
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle: { icon: material/brightness-4, name: Switch to light mode }
+
+validation:
+  nav:
+    omitted_files: warn
+    not_found: warn
+  links:
+    not_found: warn
+    anchors: warn
+    absolute_links: warn
+    unrecognized_links: warn
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds: { case: lower }

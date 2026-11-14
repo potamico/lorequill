@@ -15,13 +15,13 @@ runs locally and in CI.
 
 ## Capabilities
 
-- Pages tree for the Markdown files of a repository.
-- CodeMirror-based custom text editor with source mode and basic live-preview decorations.
-- Properties panel for safe, semantics-preserving front-matter edits.
-- Page creation, relative Markdown link insertion, and link validation.
-- A shared check engine with five declarative built-in rules, a CLI, and CI integration.
-- Explicit **Check**, **Commit**, and **Submit for review** actions on the current Git branch,
-  with GitHub review support first.
+- Pages view for the Markdown files of a repository, with drafts and a filter.
+- Page editor based on CodeMirror with live preview, a rendered preview, and a Source mode.
+- Properties view for front matter edits that keep comments, unknown keys, and the body.
+- Page creation, link insertion and completion, links that follow moved pages, and stable links.
+- A shared check engine with six declarative rules, a language server, a CLI, and a GitHub Action.
+- **Commit** with a check of the staged tree and **Submit for Review** as a GitHub pull request,
+  on the current Git branch.
 
 Lorequill is a VS Code extension, language server, and reusable check engine. It is not a web
 application, wiki, graph database, or site generator. Principles such as native save semantics, no
@@ -29,18 +29,19 @@ telemetry, and safe declarative profiles are described in the specification.
 
 ## Documentation
 
-| Document                                                              | Purpose                                |
-| --------------------------------------------------------------------- | -------------------------------------- |
-| [User guide](docs/user-guide.md)                                      | Using Lorequill as an author           |
-| [Specification](docs/specification.md)                                | Authoritative product specification    |
-| [Decisions](docs/decisions.md)                                        | How the specification is applied       |
-| [Development guide](docs/development.md)                              | Setup, build, test, and debug workflow |
-| [Commit, submit, and Git hooks](docs/git-workflow.md)                 | How Commit, Submit, and hooks interact |
-| [Checks Action](action/README.md)                                     | Running the checks in GitHub Actions   |
-| [Release procedure](docs/release.md)                                  | Versioning, packaging, and publishing  |
-| [MVP acceptance](docs/acceptance.md)                                  | Acceptance tests and release gate      |
-| [Privacy notice](docs/privacy.md)                                     | What Lorequill stores, logs, and sends |
-| [EA Body of Knowledge example](docs/examples/ea-body-of-knowledge.md) | Informative example profile only       |
+The documentation for authors and maintainers of documentation repositories is published at
+**<https://lorequill.potamico.org/>**: getting started, the user guide, and the reference of the
+profile, the checks, and the CI Action. Its source is in [`docs/`](docs/).
+
+For contributors, the repository also has:
+
+| Document                                 | Purpose                                |
+| ---------------------------------------- | -------------------------------------- |
+| [Specification](docs/specification.md)   | Authoritative product specification    |
+| [Decisions](docs/decisions.md)           | How the specification is applied       |
+| [Development guide](docs/development.md) | Setup, build, test, and debug workflow |
+| [Release procedure](docs/release.md)     | Versioning, packaging, and publishing  |
+| [MVP acceptance](docs/acceptance.md)     | Acceptance tests and release gate      |
 
 ## Quick start for contributors
 

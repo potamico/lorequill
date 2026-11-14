@@ -101,10 +101,10 @@ checks:
 
 The SHA comes from `git ls-remote https://github.com/potamico/lorequill refs/tags/v<version>`. The
 Pages view in the editor shows a notice when its engine differs from `checks.engine_version`.
-Details are in [`action/README.md`](../action/README.md).
+Details are in [CI with GitHub Actions](reference/ci.md).
 
 ## Security fixes
 
 Security and compatibility updates follow the same steps with a patch version. Announce the
 fixed version and, for the Action, the new commit SHA, in the GitHub release and the security
-advisory. Reporting is described in [`SECURITY.md`](../SECURITY.md).
+advisory. Reporting is described in [`SECURITY.md`](https://github.com/potamico/lorequill/blob/main/SECURITY.md).
