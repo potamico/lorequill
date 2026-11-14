@@ -6,6 +6,7 @@ interface Manifest {
   name: string;
   version: string;
   publisher: string;
+  icon: string;
   repository: { url: string };
   license: string;
   main: string;
@@ -118,6 +119,16 @@ describe("Pages view", () => {
     expect(container?.id).toBe("lorequill");
     expect(container?.title).toMatch(/^%.+%$/);
     expect(existsSync(resolve(packageRoot, container?.icon ?? "missing"))).toBe(true);
+    expect(readFileSync(resolve(packageRoot, ".vscodeignore"), "utf8")).toContain("!resources/**");
+  });
+
+  it("has a packaged PNG extension icon of at least 128 × 128 pixels", () => {
+    // The Marketplace and Open VSX accept only PNG icons; resources/icon.svg is the source.
+    const icon = readFileSync(resolve(packageRoot, manifest.icon));
+    expect(manifest.icon).toBe("resources/icon.png");
+    expect(icon.subarray(0, 8).toString("hex")).toBe("89504e470d0a1a0a");
+    expect(icon.readUInt32BE(16)).toBeGreaterThanOrEqual(128);
+    expect(icon.readUInt32BE(20)).toBe(icon.readUInt32BE(16));
     expect(readFileSync(resolve(packageRoot, ".vscodeignore"), "utf8")).toContain("!resources/**");
   });
 
