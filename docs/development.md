@@ -111,18 +111,19 @@ integration tests.
 
 Run these from the repository root.
 
-| Command                    | Purpose                                                                    |
-| -------------------------- | -------------------------------------------------------------------------- |
-| `npm run build`            | Bundle the extension, the CLI, and the Action (`action/dist`) with esbuild |
-| `npm run typecheck`        | Type-check all sources and tests (strict mode)                             |
-| `npm run lint`             | Run ESLint (type-aware rules)                                              |
-| `npm run format:check`     | Check formatting with Prettier                                             |
-| `npm run format`           | Apply Prettier formatting                                                  |
-| `npm run test:unit`        | Run Vitest unit and fixture tests                                          |
-| `npm run test:integration` | Build, then run VS Code extension-host tests with `@vscode/test-electron`  |
-| `npm test`                 | Run unit tests, then integration tests                                     |
-| `npm run verify`           | Typecheck, lint, format check, build, and unit tests (no VS Code needed)   |
-| `npm run package`          | Build and verify the VSIX in `dist/` (see [`release.md`](release.md))      |
+| Command                    | Purpose                                                                          |
+| -------------------------- | -------------------------------------------------------------------------------- |
+| `npm run build`            | Bundle the extension, the CLI, and the Action (`action/dist`) with esbuild       |
+| `npm run typecheck`        | Type-check all sources and tests (strict mode)                                   |
+| `npm run lint`             | Run ESLint (type-aware rules)                                                    |
+| `npm run format:check`     | Check formatting with Prettier                                                   |
+| `npm run format`           | Apply Prettier formatting                                                        |
+| `npm run test:unit`        | Run Vitest unit and fixture tests                                                |
+| `npm run test:integration` | Build, then run VS Code extension-host tests with `@vscode/test-electron`        |
+| `npm run test:webview`     | Run the editor webview tests in Chromium with Playwright (after `npm run build`) |
+| `npm test`                 | Run unit tests, then integration tests                                           |
+| `npm run verify`           | Typecheck, lint, format check, build, and unit tests (no VS Code needed)         |
+| `npm run package`          | Build and verify the VSIX in `dist/` (see [`release.md`](release.md))            |
 
 `npm run verify` is the quick pre-commit check and does not need a VS Code download. The integration
 test downloads a stable VS Code build into `packages/extension/.vscode-test/` on first use (about
@@ -223,6 +224,13 @@ cairosvg packages/extension/resources/icon.svg --output-width 256 --output-heigh
   returns only in VS Code's test mode. Dialogs are injected as prompt interfaces
   (`CommitPrompts`, `SubmitPrompts`, `NewPagePrompts`); the internal API replaces them with
   scripted answers, so production code paths carry no test parameters.
+- **Webview tests:** Playwright in Chromium, in `packages/extension/test/webview/`, run by
+  `npm run test:webview` after `npm run build`. `harness.ts` serves the built webview
+  (`packages/extension/dist/webview/`) with a simulated host that keeps the document like VS
+  Code: it applies the webview's edits, answers with `ack` or `reject`, and can change the text
+  from outside, as undo does. The tests use real clicks and keys and check the text the host would
+  save. Install the browser once with `npx playwright install chromium`; it downloads from
+  `cdn.playwright.dev` and `storage.googleapis.com` into `~/.cache/ms-playwright`.
 - **End-to-end test against GitHub (acceptance test 41):** `packages/extension/test/e2e/`, run by
   `npm run test:e2e:github`. It is skipped unless `LOREQUILL_E2E_GITHUB_REPO` (`owner/repo` of a
   disposable repository you can push to) and `LOREQUILL_E2E_GITHUB_TOKEN` (a token with
@@ -266,13 +274,13 @@ it locally:
 
 Workflows live in `.github/workflows/`. They only use GitHub-provided services and no secrets.
 
-| Workflow                | Runs on                                | Purpose                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| ----------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `ci.yml`                | push to `main`, pull requests          | `Verify` (`npm run verify`) on Linux, Windows, macOS with the current Node.js LTS and on Linux with Node.js 22; `Extension host tests` on all three systems with the current VS Code and on Linux with the minimum version 1.110.0; `Checks Action` on the demo and on `docs/`; `Documentation site` (`mkdocs build --strict`); `Package VSIX`; `Audit runtime dependencies`; aggregate job **`CI passed`**; `Documentation site (Zensical preview)` outside of it |
-| `docs.yml`              | push to `main` (documentation), manual | Builds the documentation site and deploys it to GitHub Pages                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `codeql.yml`            | push to `main`, pull requests, weekly  | CodeQL code scanning for JavaScript/TypeScript and for the workflow files                                                                                                                                                                                                                                                                                                                                                                                          |
-| `dependency-review.yml` | pull requests                          | Fails when a pull request adds a runtime dependency with a known vulnerability (moderate or higher) or with a GPL, AGPL, or SSPL license                                                                                                                                                                                                                                                                                                                           |
-| `dependabot.yml`        | weekly (Monday)                        | Grouped update pull requests for npm packages, GitHub Actions, and the Python packages of the documentation, with a seven-day cooldown for new releases                                                                                                                                                                                                                                                                                                            |
+| Workflow                | Runs on                                | Purpose                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ci.yml`                | push to `main`, pull requests          | `Verify` (`npm run verify`) on Linux, Windows, macOS with the current Node.js LTS and on Linux with Node.js 22; `Extension host tests` on all three systems with the current VS Code and on Linux with the minimum version 1.110.0; `Webview tests` (Playwright, Chromium); `Checks Action` on the demo and on `docs/`; `Documentation site` (`mkdocs build --strict`); `Package VSIX`; `Audit runtime dependencies`; aggregate job **`CI passed`**; `Documentation site (Zensical preview)` outside of it |
+| `docs.yml`              | push to `main` (documentation), manual | Builds the documentation site and deploys it to GitHub Pages                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `codeql.yml`            | push to `main`, pull requests, weekly  | CodeQL code scanning for JavaScript/TypeScript and for the workflow files                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `dependency-review.yml` | pull requests                          | Fails when a pull request adds a runtime dependency with a known vulnerability (moderate or higher) or with a GPL, AGPL, or SSPL license                                                                                                                                                                                                                                                                                                                                                                   |
+| `dependabot.yml`        | weekly (Monday)                        | Grouped update pull requests for npm packages, GitHub Actions, and the Python packages of the documentation, with a seven-day cooldown for new releases                                                                                                                                                                                                                                                                                                                                                    |
 
 `.gitattributes` forces LF line endings so Prettier and the byte-exact fixtures behave the same on
 Windows runners.

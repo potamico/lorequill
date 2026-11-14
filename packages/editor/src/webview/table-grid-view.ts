@@ -124,25 +124,31 @@ function runAt(
   }
 }
 
-/** Puts the editor cursor before or after the table and gives the editor the focus. */
+/**
+ * Puts the editor cursor before or after the table and gives the editor the focus. The cursor
+ * goes to the nearest line with text, because text typed on a line right next to a table would
+ * become part of it; without such a line it stays at the table's edge.
+ */
 function leave(view: EditorView, address: CellAddress, where: "before" | "after"): void {
   const block = findTables(view.state).find((table) => table.from === address.table);
   if (!block) {
     view.focus();
     return;
   }
-  const line =
-    where === "before"
-      ? view.state.doc.lineAt(block.from).number - 1
-      : view.state.doc.lineAt(block.to).number + 1;
-  const anchor =
-    line < 1
-      ? block.from
-      : line > view.state.doc.lines
-        ? block.to
-        : where === "before"
-          ? view.state.doc.line(line).to
-          : view.state.doc.line(line).from;
+  const doc = view.state.doc;
+  const step = where === "before" ? -1 : 1;
+  let anchor = where === "before" ? block.from : block.to;
+  for (
+    let number = doc.lineAt(where === "before" ? block.from : block.to).number + step;
+    number >= 1 && number <= doc.lines;
+    number += step
+  ) {
+    const line = doc.line(number);
+    if (line.text.trim() !== "") {
+      anchor = where === "before" ? line.to : line.from;
+      break;
+    }
+  }
   view.dispatch({ selection: EditorSelection.cursor(anchor), scrollIntoView: true });
   view.focus();
 }

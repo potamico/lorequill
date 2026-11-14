@@ -16,6 +16,8 @@ export default tseslint.config(
       "**/coverage/**",
       "**/src/generated/**",
       "**/*.vsix",
+      "test-results/**",
+      "playwright-report/**",
     ],
   },
   js.configs.recommended,
