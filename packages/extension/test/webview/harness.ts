@@ -120,6 +120,7 @@ interface PageGlobals {
     replace(from: number, to: number, text: string): void;
   };
   readonly navigator: { readonly clipboard: { writeText(text: string): Promise<void> } };
+  postMessage(message: unknown, targetOrigin: string): void;
 }
 
 /** The document as the host has it: what VS Code would save. */
@@ -159,4 +160,14 @@ export function cell(target: Page, row: number, column: number): Locator {
 /** The input of the cell being edited. */
 export function cellInput(target: Page): Locator {
   return target.locator("input.cm-lq-cell-input:focus");
+}
+
+/**
+ * Sends an editor command as the host does when a VS Code command runs, for example from the
+ * webview context menu or the command palette.
+ */
+export async function runCommand(target: Page, command: string): Promise<void> {
+  await target.evaluate((name) => {
+    (globalThis as unknown as PageGlobals).postMessage({ type: "command", command: name }, "*");
+  }, command);
 }

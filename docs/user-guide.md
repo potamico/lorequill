@@ -177,9 +177,10 @@ editors (**Open in Lorequill Editor** / **Open as Text**).
   `**bold**`, while you edit it. Tab and Shift+Tab move between cells, Tab in the last cell adds a
   row, Enter adds a row below, and Enter in an empty last row ends the table. The arrow keys move
   between cells, and Escape returns to the text. A `|` you type is saved as `\|`, and the
-  Markdown of the table stays aligned. In a table, the table button in the toolbar opens the table
-  tools: insert or delete rows and columns, align a column left, center, or right, and align the
-  table. They are also in the command palette under _Lorequill: Table_.
+  Markdown of the table stays aligned. Right-click a cell for the table tools: insert, delete, or
+  move rows and columns, align a column left, center, or right, align the table, or delete it. The
+  same tools are in the menu of the table button in the toolbar and in the command palette under
+  _Lorequill Table_.
 - **Find and replace** search the whole page. Replace All is one undo step.
 - **Save, undo, redo** are VS Code's own. `Ctrl+S`, Auto Save, and hot exit work as for any file.
   Saving never commits, checks, pushes, or switches branches.

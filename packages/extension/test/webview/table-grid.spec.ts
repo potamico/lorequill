@@ -6,6 +6,7 @@ import {
   labels,
   openEditor,
   replaceInHost,
+  runCommand,
   writeClipboard,
 } from "./harness";
 
@@ -177,4 +178,69 @@ test("a selection across the table shows its source", async ({ page: target }) =
   await target.getByText("Intro").click();
   await target.keyboard.press("Control+A");
   await expect(target.getByText("| Item | Price |")).toBeVisible();
+});
+
+test("each cell tells VS Code's context menu which table tools apply", async ({ page: target }) => {
+  const context = async (row: number, column: number): Promise<unknown> =>
+    JSON.parse((await cell(target, row, column).getAttribute("data-vscode-context")) ?? "null");
+  expect(await context(0, 0)).toEqual({
+    webviewSection: "tableCell",
+    tableHeader: true,
+    tableFirstRow: false,
+    tableLastRow: false,
+    tableFirstColumn: true,
+    tableLastColumn: false,
+    tableSingleColumn: false,
+  });
+  expect(await context(1, 1)).toMatchObject({
+    tableHeader: false,
+    tableFirstRow: true,
+    tableLastRow: true,
+    tableLastColumn: true,
+  });
+
+  // The marks follow the table's shape when rows are added.
+  await cell(target, 1, 1).click();
+  await target.keyboard.press("Enter");
+  expect(await context(1, 1)).toMatchObject({ tableLastRow: false });
+  expect(await context(2, 0)).toMatchObject({ tableLastRow: true, tableFirstRow: false });
+});
+
+test("a right click edits the clicked cell, so context menu commands act on it", async ({
+  page: target,
+}) => {
+  await cell(target, 1, 1).click();
+  await target.keyboard.press("Enter");
+  await target.keyboard.type("Water");
+  await cell(target, 1, 0).click({ button: "right" });
+  await expect(cellInput(target)).toHaveValue("Tea");
+
+  await runCommand(target, "tableMoveRowDown");
+  await expect.poll(() => hostText(target)).toMatch(/\| Water +\| +\|\n\| Tea +\| +3 \|/);
+  await expect(cellInput(target)).toHaveValue("Tea");
+
+  await cell(target, 0, 1).click({ button: "right" });
+  await runCommand(target, "tableMoveColumnLeft");
+  await expect.poll(() => hostText(target)).toContain("| Price | Item  |");
+});
+
+test("Delete table removes it and returns to the text", async ({ page: target }) => {
+  await cell(target, 1, 0).click({ button: "right" });
+  await runCommand(target, "tableDelete");
+
+  await expect(target.locator(".cm-lq-table")).toHaveCount(0);
+  await expect(target.locator(".cm-content")).toBeFocused();
+  await expect.poll(() => hostText(target)).toBe("# Prices\n\nIntro\n\nEnd\n");
+});
+
+test("the toolbar menu offers moving rows and columns and deleting the table", async ({
+  page: target,
+}) => {
+  await cell(target, 1, 0).click();
+  await target.locator(".lq-button .codicon-table").click();
+  const menu = target.getByRole("menu", { name: labels.tableTools });
+  await expect(menu.getByRole("menuitem", { name: labels.tableMoveRowUp })).toBeDisabled();
+  await expect(menu.getByRole("menuitem", { name: labels.tableMoveColumnRight })).toBeEnabled();
+  await menu.getByRole("menuitem", { name: labels.tableMoveColumnRight }).click();
+  await expect.poll(() => hostText(target)).toMatch(/\| Price \| Item \|/);
 });

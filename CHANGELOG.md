@@ -13,8 +13,9 @@ the check engine, the CLI, and the GitHub Action. The format follows
   and references for the profile, the checks, and the CI Action.
 - Tables are edited as a grid in the page editor: click a cell and type. Tab, Shift+Tab, Enter,
   and the arrow keys move between cells and add rows, and the Markdown of the table stays aligned.
-  The table button and the command palette offer table tools to insert and delete rows and
-  columns, set a column's alignment, and align the table.
+  The context menu of a cell, the table button, and the command palette offer table tools to
+  insert, delete, and move rows and columns, set a column's alignment, align the table, and delete
+  it.
 - Extension icon for the Marketplace, Open VSX, and the Extensions view.
 
 ### Changed

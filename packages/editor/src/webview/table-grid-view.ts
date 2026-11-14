@@ -38,6 +38,27 @@ function cellsOf(grid: HTMLElement): HTMLTableCellElement[][] {
   );
 }
 
+/**
+ * Marks every cell for VS Code's webview context menu (`webview/context` in the extension
+ * manifest): the menu shows the table tools that apply to the clicked cell.
+ */
+function markCells(grid: HTMLElement): void {
+  const rows = cellsOf(grid);
+  rows.forEach((cells, row) => {
+    cells.forEach((cell, column) => {
+      cell.dataset.vscodeContext = JSON.stringify({
+        webviewSection: "tableCell",
+        tableHeader: row === 0,
+        tableFirstRow: row === 1,
+        tableLastRow: row === rows.length - 1,
+        tableFirstColumn: column === 0,
+        tableLastColumn: column === cells.length - 1,
+        tableSingleColumn: cells.length === 1,
+      });
+    });
+  });
+}
+
 function addressOf(
   view: EditorView,
   grid: HTMLElement,
@@ -87,6 +108,7 @@ function refresh(grid: HTMLElement, source: string): void {
     rendered.every((row, index) => row.length === current[index]?.length);
   if (!sameShape) {
     grid.innerHTML = renderPreview(source);
+    markCells(grid);
     return;
   }
   const texts = tableCells(source);
@@ -374,6 +396,7 @@ export class TableGridWidget extends WidgetType {
     const grid = document.createElement("div");
     grid.className = "cm-lq-table";
     grid.innerHTML = renderPreview(this.source);
+    markCells(grid);
     grid.addEventListener("mousedown", (event) => {
       if (event.button !== 0 || !(event.target instanceof Element)) {
         return;
@@ -391,6 +414,17 @@ export class TableGridWidget extends WidgetType {
       const cell = event.target.closest<HTMLTableCellElement>("td, th");
       if (cell) {
         event.preventDefault();
+        edit(view, grid, cell, "end");
+      }
+    });
+    // A right click edits the clicked cell first, so the context menu's table tools act on it.
+    // The event itself is left to VS Code, which shows the menu.
+    grid.addEventListener("contextmenu", (event) => {
+      const cell =
+        event.target instanceof Element
+          ? event.target.closest<HTMLTableCellElement>("td, th")
+          : null;
+      if (cell && !activeInput(cell)) {
         edit(view, grid, cell, "end");
       }
     });

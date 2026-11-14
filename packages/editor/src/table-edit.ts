@@ -400,6 +400,89 @@ export function alignColumn(
   return rewrite(state, table, table.rows, alignments, cursor);
 }
 
+/** Moves the cursor's row up or down among the body rows; the header stays first. */
+export function moveRow(state: EditorState, direction: "up" | "down"): TransactionSpec | undefined {
+  const found = tableAtCursor(state);
+  if (!found?.table.regular) {
+    return undefined;
+  }
+  const { table, cursor } = found;
+  const target = direction === "up" ? cursor.row - 1 : cursor.row + 1;
+  if (cursor.row === 0 || target < 1 || target >= table.rows.length) {
+    return undefined;
+  }
+  const rows = table.rows.map((row) => [...row]);
+  const moved = rows[cursor.row];
+  const other = rows[target];
+  if (!moved || !other) {
+    return undefined;
+  }
+  rows[cursor.row] = other;
+  rows[target] = moved;
+  return rewrite(state, table, rows, table.alignments, { ...cursor, row: target });
+}
+
+/** Moves the cursor's column left or right, with its alignment. */
+export function moveColumn(
+  state: EditorState,
+  direction: "left" | "right",
+): TransactionSpec | undefined {
+  const found = tableAtCursor(state);
+  if (!found?.table.regular) {
+    return undefined;
+  }
+  const { table, cursor } = found;
+  const target = direction === "left" ? cursor.column - 1 : cursor.column + 1;
+  if (target < 0 || target >= table.alignments.length) {
+    return undefined;
+  }
+  const swap = <T>(items: readonly T[]): T[] => {
+    const copy = [...items];
+    const moved = copy[cursor.column];
+    const other = copy[target];
+    if (moved !== undefined && other !== undefined) {
+      copy[cursor.column] = other;
+      copy[target] = moved;
+    }
+    return copy;
+  };
+  const rows = table.rows.map((row) => swap(row));
+  return rewrite(state, table, rows, swap(table.alignments), { ...cursor, column: target });
+}
+
+/**
+ * Removes the table at the cursor with its line break. A blank line that separated it from text
+ * on both sides is kept once, so the surrounding paragraphs stay apart.
+ */
+export function deleteTable(state: EditorState): TransactionSpec | undefined {
+  const found = tableAtCursor(state);
+  if (!found) {
+    return undefined;
+  }
+  const { doc } = state;
+  const first = doc.lineAt(found.table.from);
+  const last = doc.lineAt(found.table.to);
+  let from = first.from;
+  let to = last.to;
+  if (last.number < doc.lines) {
+    // The table's lines go with the line break after them.
+    to = doc.line(last.number + 1).from;
+    const blankBefore = first.number === 1 || doc.line(first.number - 1).text.trim() === "";
+    const next = doc.line(last.number + 1);
+    if (blankBefore && next.text.trim() === "" && next.number < doc.lines) {
+      to = doc.line(next.number + 1).from;
+    }
+  } else if (first.number > 1) {
+    from = doc.line(first.number - 1).to;
+  }
+  return {
+    changes: { from, to },
+    selection: EditorSelection.cursor(from),
+    userEvent: "delete",
+    scrollIntoView: true,
+  };
+}
+
 /** Whether the main cursor is in a table that the table tools can edit. */
 export function inTable(state: EditorState): boolean {
   return tableAtCursor(state) !== undefined;

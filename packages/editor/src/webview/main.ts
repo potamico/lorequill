@@ -27,10 +27,13 @@ import {
   alignColumn,
   deleteColumn,
   deleteRow,
+  deleteTable,
   formatTable,
   inTable,
   insertColumn,
   insertRow,
+  moveColumn,
+  moveRow,
   nextCell,
   previousCell,
   tableEnter,
@@ -706,15 +709,21 @@ const TABLE_ACTIONS: Readonly<
   tableAlignLeft: (state) => alignColumn(state, "left"),
   tableAlignCenter: (state) => alignColumn(state, "center"),
   tableAlignRight: (state) => alignColumn(state, "right"),
+  tableMoveRowUp: (state) => moveRow(state, "up"),
+  tableMoveRowDown: (state) => moveRow(state, "down"),
+  tableMoveColumnLeft: (state) => moveColumn(state, "left"),
+  tableMoveColumnRight: (state) => moveColumn(state, "right"),
   tableFormat: formatTable,
+  tableDelete: deleteTable,
 };
 
 /** The table tools, in the order and groups of the menu. */
 const TABLE_MENU: readonly (readonly TableCommand[])[] = [
   ["tableInsertRowAbove", "tableInsertRowBelow", "tableDeleteRow"],
   ["tableInsertColumnLeft", "tableInsertColumnRight", "tableDeleteColumn"],
+  ["tableMoveRowUp", "tableMoveRowDown", "tableMoveColumnLeft", "tableMoveColumnRight"],
   ["tableAlignLeft", "tableAlignCenter", "tableAlignRight"],
-  ["tableFormat"],
+  ["tableFormat", "tableDelete"],
 ];
 
 function runTableCommand(command: TableCommand): void {

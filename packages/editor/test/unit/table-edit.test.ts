@@ -12,10 +12,13 @@ import {
   tableCells,
   deleteColumn,
   deleteRow,
+  deleteTable,
   formatTable,
   inTable,
   insertColumn,
   insertRow,
+  moveColumn,
+  moveRow,
   nextCell,
   previousCell,
   tableEnter,
@@ -273,5 +276,50 @@ describe("leaving an aligned table", () => {
     const aligned = "| a   | b   |\n| --- | --- |\n| 1^   | 2   |";
     const state = stateOf(aligned);
     expect(formatTable(state)?.changes).toBeUndefined();
+  });
+});
+
+describe("moving rows and columns", () => {
+  const three = "| a | b |\n|---|--:|\n| 1 | 2 |\n| 3^ | 4 |";
+
+  it("moves a body row up and down, with the cursor", () => {
+    expect(run(three, (state) => moveRow(state, "up"))).toBe(
+      "| a   |   b |\n| --- | --: |\n| 3^   |   4 |\n| 1   |   2 |",
+    );
+    expect(run(three, (state) => moveRow(state, "down"))).toBeUndefined();
+  });
+
+  it("never moves the header or a row above it", () => {
+    expect(
+      run("| a^ | b |\n|---|---|\n| 1 | 2 |", (state) => moveRow(state, "down")),
+    ).toBeUndefined();
+    expect(
+      run("| a | b |\n|---|---|\n| 1^ | 2 |", (state) => moveRow(state, "up")),
+    ).toBeUndefined();
+  });
+
+  it("moves a column with its alignment", () => {
+    expect(run(three, (state) => moveColumn(state, "right"))).toBe(
+      "|   b | a   |\n| --: | --- |\n|   2 | 1   |\n|   4 | 3^   |",
+    );
+    expect(run(three, (state) => moveColumn(state, "left"))).toBeUndefined();
+  });
+});
+
+describe("deleteTable", () => {
+  it("removes the table and keeps one blank line between the paragraphs", () => {
+    expect(run("Intro\n\n| a |\n|---|\n| 1^ |\n\nEnd\n", deleteTable)).toBe("Intro\n\n^End\n");
+  });
+
+  it("removes a table at the end of the page", () => {
+    expect(run("Intro\n\n| a |\n|---|\n| 1^ |", deleteTable)).toBe("Intro\n^");
+  });
+
+  it("removes a table at the start of the page", () => {
+    expect(run("| a^ |\n|---|\n\nText", deleteTable)).toBe("^Text");
+  });
+
+  it("does nothing outside a table", () => {
+    expect(run("Just ^text", deleteTable)).toBeUndefined();
   });
 });
