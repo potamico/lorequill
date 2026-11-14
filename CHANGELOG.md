@@ -13,6 +13,11 @@ the check engine, the CLI, and the GitHub Action. The format follows
   and references for the profile, the checks, and the CI Action.
 - Extension icon for the Marketplace, Open VSX, and the Extensions view.
 
+### Changed
+
+- The extension is listed in the Marketplace and Open VSX categories "Linters" and "Other"
+  instead of only "Other".
+
 ### Fixed
 
 - The page editor shows text between single tildes (`~text~`) as struck through, as GFM and the
