@@ -7,8 +7,10 @@ the check engine, the CLI, and the GitHub Action. The format follows
 
 ## [Unreleased]
 
-The first release will be 0.2.0. The extension is "Lorequill – Structured Knowledge
-Documentation", with the identifier `potamico.vscode-lorequill`.
+## [0.2.0] - 2026-11-14
+
+First release. The extension is "Lorequill – Structured Knowledge Documentation", with the
+identifier `potamico.vscode-lorequill`.
 
 ### Added
 
@@ -49,4 +51,5 @@ Documentation", with the identifier `potamico.vscode-lorequill`.
 - User guide, specification, decisions, privacy notice, release procedure, and acceptance
   traceability.
 
-[Unreleased]: https://github.com/potamico/lorequill/commits/main
+[Unreleased]: https://github.com/potamico/lorequill/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/potamico/lorequill/releases/tag/v0.2.0
