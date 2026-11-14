@@ -241,17 +241,27 @@ python3 -m venv .venv
 navigation, as CI does. A new page needs an entry in `nav` of `mkdocs.yml`, or an entry in
 `exclude_docs` if it is a developer document.
 
+Material for MkDocs reaches its end of life in May 2027 (decision D35). Until the move, CI also
+builds the site with its successor Zensical, which reads the same `mkdocs.yml`. That job is not part
+of **`CI passed`**; its built site is kept as the artifact `site-zensical` for seven days. To build
+it locally:
+
+```bash
+.venv/bin/pip install -r docs/requirements-zensical.txt
+.venv/bin/zensical serve
+```
+
 ## Continuous integration and repository security
 
 Workflows live in `.github/workflows/`. They only use GitHub-provided services and no secrets.
 
-| Workflow                | Runs on                                | Purpose                                                                                                                                                                                                                                                                                                                              |
-| ----------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `ci.yml`                | push to `main`, pull requests          | `Verify` (`npm run verify`) on Linux, Windows, macOS with the current Node.js LTS and on Linux with Node.js 22; `Extension host tests` on all three systems; `Checks Action` on the demo and on `docs/`; `Documentation site` (`mkdocs build --strict`); `Package VSIX`; `Audit runtime dependencies`; aggregate job **`CI passed`** |
-| `docs.yml`              | push to `main` (documentation), manual | Builds the documentation site and deploys it to GitHub Pages                                                                                                                                                                                                                                                                         |
-| `codeql.yml`            | push to `main`, pull requests, weekly  | CodeQL code scanning for JavaScript/TypeScript and for the workflow files                                                                                                                                                                                                                                                            |
-| `dependency-review.yml` | pull requests                          | Fails when a pull request adds a runtime dependency with a known vulnerability (moderate or higher) or with a GPL, AGPL, or SSPL license                                                                                                                                                                                             |
-| `dependabot.yml`        | weekly (Monday)                        | Grouped update pull requests for npm packages, GitHub Actions, and the Python packages of the documentation, with a seven-day cooldown for new releases                                                                                                                                                                              |
+| Workflow                | Runs on                                | Purpose                                                                                                                                                                                                                                                                                                                                                                                     |
+| ----------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ci.yml`                | push to `main`, pull requests          | `Verify` (`npm run verify`) on Linux, Windows, macOS with the current Node.js LTS and on Linux with Node.js 22; `Extension host tests` on all three systems; `Checks Action` on the demo and on `docs/`; `Documentation site` (`mkdocs build --strict`); `Package VSIX`; `Audit runtime dependencies`; aggregate job **`CI passed`**; `Documentation site (Zensical preview)` outside of it |
+| `docs.yml`              | push to `main` (documentation), manual | Builds the documentation site and deploys it to GitHub Pages                                                                                                                                                                                                                                                                                                                                |
+| `codeql.yml`            | push to `main`, pull requests, weekly  | CodeQL code scanning for JavaScript/TypeScript and for the workflow files                                                                                                                                                                                                                                                                                                                   |
+| `dependency-review.yml` | pull requests                          | Fails when a pull request adds a runtime dependency with a known vulnerability (moderate or higher) or with a GPL, AGPL, or SSPL license                                                                                                                                                                                                                                                    |
+| `dependabot.yml`        | weekly (Monday)                        | Grouped update pull requests for npm packages, GitHub Actions, and the Python packages of the documentation, with a seven-day cooldown for new releases                                                                                                                                                                                                                                     |
 
 `.gitattributes` forces LF line endings so Prettier and the byte-exact fixtures behave the same on
 Windows runners.

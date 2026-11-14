@@ -15,7 +15,7 @@ exclude_docs: |
   /development.md
   /release.md
   /acceptance.md
-  /requirements.txt
+  /requirements*.txt
   __pycache__/
 
 nav:
