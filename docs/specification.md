@@ -58,7 +58,7 @@ This is a VS Code extension, language server, and reusable check engine, not a w
 - Incoming/outgoing link panels and hover previews.
 - Unlinked-mention discovery and conversion, including reverse mentions.
 - MkDocs navigation notice.
-- Live-preview widgets beyond the MVP set of §8, such as in-place table cell editing.
+- Live-preview widgets beyond the MVP set of §8.
 - A floating formatting toolbar shown next to a text selection.
 - Paste as Markdown: converting rich clipboard content (for example from a word processor or browser) into Markdown text on paste.
 - Focus mode (dims everything except the current paragraph) and typewriter mode (keeps the current line vertically centered).
@@ -212,7 +212,7 @@ A directory's plus action creates a page in that exact directory. The author sup
 
 The custom text editor uses CodeMirror 6 and offers three view modes, selected through a segmented control in the toolbar (`Edit` / `Both` / `Preview`) and through commands:
 
-- **`Edit`** (default) is WYSIWYG-style live-preview editing inside CodeMirror. Markdown syntax is hidden or replaced by decorations and widgets, and revealed for the construct that contains the cursor or selection. The MVP set covers headings, emphasis, strikethrough, inline code, links, bullet and numbered lists, task-list checkboxes, quotes, horizontal rules, fenced code blocks with syntax highlighting, Material for MkDocs admonitions, and tables. Toggling a checkbox is a single-character text edit. A table is rendered as a grid; editing it reveals its Markdown source. In the source of a table, Tab and Shift+Tab move to the next and previous cell, Tab in the last cell adds a row, Enter adds a row below, and Enter in an empty last row ends the table; each of these realigns the table. Unknown or unsupported constructs are shown as source, never hidden or reinterpreted.
+- **`Edit`** (default) is WYSIWYG-style live-preview editing inside CodeMirror. Markdown syntax is hidden or replaced by decorations and widgets, and revealed for the construct that contains the cursor or selection. The MVP set covers headings, emphasis, strikethrough, inline code, links, bullet and numbered lists, task-list checkboxes, quotes, horizontal rules, fenced code blocks with syntax highlighting, Material for MkDocs admonitions, and tables. Toggling a checkbox is a single-character text edit. A top-level table is rendered as an editable grid: a click edits a cell, which shows its own Markdown text in a one-line input while the other cells stay rendered, and every keystroke writes the cell's text into the document. Tab and Shift+Tab move to the next and previous cell, Tab in the last cell adds a row, Enter adds a row below, Enter in an empty last row ends the table, the arrow keys move between cells and out of the table, and Escape returns to the text after it. Typed pipes are escaped, and leaving a cell realigns the table's source. A selection that covers part of a table, such as a search match, shows its source. In the Markdown source of a table, as in `Source`, Tab, Shift+Tab, and Enter move between cells and add rows in the same way. Unknown or unsupported constructs are shown as source, never hidden or reinterpreted.
 - **`Both`** shows the same editor as `Edit` (live preview, or source with `Source`) beside a read-only rendered preview, with synchronized scrolling in both directions. On narrow editor widths it falls back to `Edit`.
 - **`Preview`** shows only the read-only rendered preview.
 

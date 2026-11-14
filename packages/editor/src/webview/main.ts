@@ -52,6 +52,7 @@ import { admonitionSyntax } from "../admonition-syntax";
 import { singleTildeStrikethrough } from "../strikethrough-syntax";
 import { codeHighlighter, codeLanguages } from "../code-languages";
 import { linkTargetAt } from "../link-at";
+import { focusTableCell } from "./table-grid-view";
 import type { PreviewContext } from "../render";
 import {
   buildAnchors,
@@ -665,7 +666,10 @@ function format(command: (state: EditorState) => TransactionSpec | undefined): v
   if (spec) {
     view.dispatch(spec);
   }
-  view.focus();
+  // In a table shown as a grid, the cell with the cursor gets the focus back (§8).
+  if (livePreviewActive !== true || !focusTableCell(view)) {
+    view.focus();
+  }
 }
 
 function request(action: HostAction): void {

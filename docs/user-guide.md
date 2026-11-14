@@ -173,11 +173,13 @@ editors (**Open in Lorequill Editor** / **Open as Text**).
 - **Formatting.** The toolbar and the usual shortcuts format the selection: bold, italic, headings,
   lists, tasks, quotes, code, tables, and links. Enter continues a list, Tab and Shift+Tab indent
   list items, and brackets and backticks close automatically.
-- **Tables** appear as a grid. Click a cell to edit the table's Markdown: Tab and Shift+Tab move
-  between cells, Tab in the last cell adds a row, and Enter adds a row below; Enter in an empty
-  last row ends the table. The columns stay aligned as you go. In a table, the table button in the
-  toolbar opens the table tools: insert or delete rows and columns, align a column left, center,
-  or right, and align the table. They are also in the command palette under _Lorequill: Table_.
+- **Tables** are edited as a grid. Click a cell and type; the cell shows its Markdown, such as
+  `**bold**`, while you edit it. Tab and Shift+Tab move between cells, Tab in the last cell adds a
+  row, Enter adds a row below, and Enter in an empty last row ends the table. The arrow keys move
+  between cells, and Escape returns to the text. A `|` you type is saved as `\|`, and the
+  Markdown of the table stays aligned. In a table, the table button in the toolbar opens the table
+  tools: insert or delete rows and columns, align a column left, center, or right, and align the
+  table. They are also in the command palette under _Lorequill: Table_.
 - **Find and replace** search the whole page. Replace All is one undo step.
 - **Save, undo, redo** are VS Code's own. `Ctrl+S`, Auto Save, and hot exit work as for any file.
   Saving never commits, checks, pushes, or switches branches.

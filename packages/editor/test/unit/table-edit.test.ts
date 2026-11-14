@@ -4,6 +4,12 @@ import { EditorState, type TransactionSpec } from "@codemirror/state";
 import { describe, expect, it } from "vitest";
 import {
   alignColumn,
+  cellAtCursor,
+  cellCursor,
+  cellSource,
+  escapeCell,
+  setCell,
+  tableCells,
   deleteColumn,
   deleteRow,
   formatTable,
@@ -201,5 +207,71 @@ describe("rows and columns", () => {
   it("reports whether the cursor is in an editable table", () => {
     expect(inTable(stateOf(table))).toBe(true);
     expect(inTable(stateOf("^Text"))).toBe(false);
+  });
+});
+
+describe("cells of the table grid", () => {
+  const doc = "Intro\n\n| Name | Value |\n| ---- | ----: |\n| a    |     1 |\n| b |\n";
+  const tableStart = doc.indexOf("|");
+
+  it("reads a cell's trimmed text and range", () => {
+    const state = stateOf(doc);
+    const source = cellSource(state, { table: tableStart, row: 1, column: 1 });
+    expect(source?.text).toBe("1");
+    expect(doc.slice(source?.from, source?.to)).toBe("1");
+    expect(cellSource(state, { table: tableStart, row: 0, column: 0 })?.text).toBe("Name");
+    expect(cellSource(state, { table: tableStart, row: 2, column: 1 })).toBeUndefined();
+    expect(cellSource(state, { table: tableStart + 1, row: 0, column: 0 })).toBeUndefined();
+  });
+
+  it("writes only the cell's text while typing, with the cursor in the cell", () => {
+    const state = stateOf(doc);
+    const spec = setCell(state, { table: tableStart, row: 1, column: 0 }, "abc", 2);
+    const next = state.update(spec ?? {}).state;
+    expect(next.sliceDoc()).toBe(doc.replace("| a    |", "| abc    |"));
+    expect(spec?.userEvent).toBe("input.type");
+    const head = next.selection.main.head;
+    expect(next.sliceDoc(head - 2, head)).toBe("ab");
+  });
+
+  it("does nothing when the text is unchanged", () => {
+    expect(setCell(stateOf(doc), { table: tableStart, row: 1, column: 0 }, "a", 1)).toBeUndefined();
+  });
+
+  it("escapes pipes typed into a cell and keeps escaped ones", () => {
+    const state = stateOf(doc);
+    const spec = setCell(state, { table: tableStart, row: 1, column: 0 }, "x|y \\| z", 3);
+    expect(state.update(spec ?? {}).state.sliceDoc()).toContain("| x\\|y \\| z    |");
+    expect(escapeCell("a|b\\|c\nd")).toBe("a\\|b\\|c d");
+  });
+
+  it("adds a cell missing from a short row by realigning the table", () => {
+    const state = stateOf(doc);
+    const spec = setCell(state, { table: tableStart, row: 2, column: 1 }, "2", 1);
+    const next = state.update(spec ?? {}).state;
+    expect(next.sliceDoc()).toContain("| b    |     2 |");
+    expect(next.sliceDoc(next.selection.main.head - 1, next.selection.main.head)).toBe("2");
+  });
+
+  it("maps a cell and offset to a cursor position and back", () => {
+    const state = stateOf(doc);
+    const address = { table: tableStart, row: 0, column: 1 };
+    const position = cellCursor(state, address, 2);
+    expect(doc.slice(position, position + 3)).toBe("lue");
+    const moved = state.update({ selection: { anchor: position } }).state;
+    expect(cellAtCursor(moved)).toEqual({ ...address, offset: 2 });
+    expect(cellCursor(state, address, 99)).toBe(cellSource(state, address)?.to);
+  });
+
+  it("lists the cell texts of a table source without the delimiter row", () => {
+    expect(tableCells("| a | b \\| c |\r\n|---|---|\r\n| 1 |")).toEqual([["a", "b \\| c"], ["1"]]);
+  });
+});
+
+describe("leaving an aligned table", () => {
+  it("does not rewrite a table that is already aligned", () => {
+    const aligned = "| a   | b   |\n| --- | --- |\n| 1^   | 2   |";
+    const state = stateOf(aligned);
+    expect(formatTable(state)?.changes).toBeUndefined();
   });
 });

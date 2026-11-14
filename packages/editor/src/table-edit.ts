@@ -50,7 +50,9 @@ function splitRow(text: string): { cells: string[]; starts: number[] } {
   for (let index = start; index <= end; index++) {
     if (index === end || (text[index] === "|" && text[index - 1] !== "\\")) {
       const raw = text.slice(cellStart, index);
-      const leading = raw.length - raw.trimStart().length;
+      // An empty cell starts after one padding space, so typed text gets a space before it.
+      const trimmed = raw.trimStart();
+      const leading = trimmed === "" ? Math.min(1, raw.length) : raw.length - trimmed.length;
       cells.push(raw.trim());
       starts.push(cellStart + leading);
       cellStart = index + 1;
@@ -208,6 +210,7 @@ function rewrite(
   alignments: ColumnAlignment[],
   target: CellCursor,
   after = "",
+  userEvent = "input.format",
 ): TransactionSpec {
   const { text, starts } = format(rows, alignments, state.lineBreak);
   const row = Math.min(target.row, rows.length - 1);
@@ -217,10 +220,15 @@ function rewrite(
     after === ""
       ? table.from + (starts[row]?.[column] ?? 0) + Math.min(target.offset, cell.length)
       : table.from + state.toText(text + after).length;
+  const selection = EditorSelection.cursor(anchor);
+  // An already aligned table is not rewritten, so leaving a cell changes nothing.
+  if (text + after === state.sliceDoc(table.from, table.to)) {
+    return { selection, scrollIntoView: true };
+  }
   return {
     changes: { from: table.from, to: table.to, insert: text + after },
-    selection: EditorSelection.cursor(anchor),
-    userEvent: "input.format",
+    selection,
+    userEvent,
     scrollIntoView: true,
   };
 }
@@ -395,4 +403,124 @@ export function alignColumn(
 /** Whether the main cursor is in a table that the table tools can edit. */
 export function inTable(state: EditorState): boolean {
   return tableAtCursor(state) !== undefined;
+}
+
+/** A cell of the table grid: the table by its start, the row (header 0), and the column. */
+export interface CellAddress {
+  readonly table: number;
+  readonly row: number;
+  readonly column: number;
+}
+
+/** The cell that contains the main cursor, with the cursor's offset in the cell's text. */
+export function cellAtCursor(state: EditorState): (CellAddress & { offset: number }) | undefined {
+  const found = tableAtCursor(state);
+  if (!found) {
+    return undefined;
+  }
+  const { table, cursor } = found;
+  return { table: table.from, row: cursor.row, column: cursor.column, offset: cursor.offset };
+}
+
+/** The line of a row: the header is the first line, the body rows follow the delimiter row. */
+function rowLine(state: EditorState, address: CellAddress) {
+  const block = findTables(state).find((table) => table.from === address.table);
+  if (!block) {
+    return undefined;
+  }
+  const number = state.doc.lineAt(block.from).number + (address.row === 0 ? 0 : address.row + 1);
+  return number <= state.doc.lineAt(block.to).number ? state.doc.line(number) : undefined;
+}
+
+/**
+ * The source of a cell: its trimmed text and where it is. `undefined` when the row has no such
+ * cell, as GFM fills short rows.
+ */
+export function cellSource(
+  state: EditorState,
+  address: CellAddress,
+): { from: number; to: number; text: string } | undefined {
+  const line = rowLine(state, address);
+  if (!line) {
+    return undefined;
+  }
+  const { cells, starts } = splitRow(line.text);
+  const text = cells[address.column];
+  const start = starts[address.column];
+  if (text === undefined || start === undefined) {
+    return undefined;
+  }
+  return { from: line.from + start, to: line.from + start + text.length, text };
+}
+
+/** The texts of the cells of a table's source, the header first, without the delimiter row. */
+export function tableCells(source: string): string[][] {
+  return source
+    .split(/\r?\n/)
+    .filter((_, index) => index !== 1)
+    .map((line) => splitRow(line).cells);
+}
+
+/** Cell text as Markdown: pipes are escaped and line breaks become spaces. */
+export function escapeCell(value: string): string {
+  let result = "";
+  for (let index = 0; index < value.length; index++) {
+    const character = value[index] ?? "";
+    if (character === "|" && value[index - 1] !== "\\") {
+      result += "\\|";
+    } else {
+      result += /[\r\n\t]/.test(character) ? " " : character;
+    }
+  }
+  return result;
+}
+
+/** The source position for a cursor at `offset` in a cell's text. */
+export function cellCursor(state: EditorState, address: CellAddress, offset: number): number {
+  const source = cellSource(state, address);
+  if (source) {
+    return source.from + Math.min(Math.max(offset, 0), source.text.length);
+  }
+  return rowLine(state, address)?.to ?? address.table;
+}
+
+/**
+ * Writes the text of a cell typed in the table grid, with the cursor at `caret` in it. Only the
+ * cell's text changes, so typing is a small edit; a cell missing from a short row is first
+ * added by realigning the table.
+ */
+export function setCell(
+  state: EditorState,
+  address: CellAddress,
+  value: string,
+  caret: number,
+): TransactionSpec | undefined {
+  const text = escapeCell(value);
+  const offset = escapeCell(value.slice(0, caret)).length;
+  const source = cellSource(state, address);
+  if (source) {
+    if (source.text === text) {
+      return undefined;
+    }
+    return {
+      changes: { from: source.from, to: source.to, insert: text },
+      selection: EditorSelection.cursor(source.from + offset),
+      userEvent: "input.type",
+    };
+  }
+  const block = findTables(state).find((table) => table.from === address.table);
+  if (!block) {
+    return undefined;
+  }
+  const table = parseTable(state, block.from, block.to);
+  const row = table.rows[address.row];
+  if (!table.regular || !row || address.column >= row.length) {
+    return undefined;
+  }
+  const rows = table.rows.map((cells) => [...cells]);
+  const target = rows[address.row];
+  if (target) {
+    target[address.column] = text;
+  }
+  return rewrite(state, table, rows, table.alignments, { ...address, offset }, "", "input.type");
 }
