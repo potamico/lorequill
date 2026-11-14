@@ -18,7 +18,7 @@ a different engine:
 ```yaml
 # .lorequill/config.yaml
 checks:
-  engine_version: 0.2.0 # the engine version of the pinned Action
+  engine_version: 0.3.0 # the engine version of the pinned Action
 ```
 
 ```yaml

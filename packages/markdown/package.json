@@ -1,6 +1,6 @@
 {
   "name": "@lorequill/markdown",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Lorequill Markdown utilities: front matter, page titles, and filename slugs",
   "license": "Apache-2.0",

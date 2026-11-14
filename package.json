@@ -1,6 +1,6 @@
 {
   "name": "lorequill-workspace",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Monorepo root for Lorequill - Structured Knowledge Documentation for Visual Studio Code",
   "license": "Apache-2.0",

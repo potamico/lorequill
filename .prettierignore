@@ -31,3 +31,6 @@ fixtures/anchors/
 /.cache/
 /test-results/
 /playwright-report/
+
+# Local Claude Code settings (not versioned).
+/.claude/settings.local.json

@@ -27661,7 +27661,7 @@ function checkPageValues(page, rule, allowed, allowedText, context) {
 // package.json
 var package_default = {
   name: "@lorequill/checks",
-  version: "0.2.0",
+  version: "0.3.0",
   private: true,
   description: "Lorequill check engine and CLI: declarative repository checks shared by editor and CI",
   license: "Apache-2.0",
@@ -27679,8 +27679,8 @@ var package_default = {
     typecheck: "tsc -p tsconfig.json --noEmit"
   },
   dependencies: {
-    "@lorequill/markdown": "0.2.0",
-    "@lorequill/profile": "0.2.0"
+    "@lorequill/markdown": "0.3.0",
+    "@lorequill/profile": "0.3.0"
   },
   devDependencies: {
     esbuild: "0.28.2"

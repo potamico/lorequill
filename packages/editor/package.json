@@ -1,6 +1,6 @@
 {
   "name": "@lorequill/editor",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Lorequill page editor: CodeMirror 6 webview and its synchronization protocol, without VS Code dependencies",
   "license": "Apache-2.0",
@@ -34,7 +34,7 @@
     "@lezer/common": "1.5.5",
     "@lezer/highlight": "1.2.5",
     "@lezer/markdown": "1.8.1",
-    "@lorequill/markdown": "0.2.0",
+    "@lorequill/markdown": "0.3.0",
     "@vscode/codicons": "0.0.45",
     "hast-util-sanitize": "5.0.2",
     "hast-util-to-html": "9.0.6",

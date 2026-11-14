@@ -1,6 +1,6 @@
 {
   "name": "@lorequill/profile",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Lorequill repository profile: closed JSON Schema, generated types, validator, and loader",
   "license": "Apache-2.0",
