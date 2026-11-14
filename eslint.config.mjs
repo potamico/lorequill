@@ -12,6 +12,7 @@ export default tseslint.config(
       "**/.vscode-test/**",
       "**/.venv/**",
       "samples/demo/site/**",
+      "site/**",
       "**/coverage/**",
       "**/src/generated/**",
       "**/*.vsix",

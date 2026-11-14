@@ -54,7 +54,7 @@ checks:
 The built-in rules are `relative-links`, `forbidden-text`, `unique-field`, `allow-values`,
 `field-format`, and `reference-field`. Profiles are data only. They cannot contain commands, scripts, or regular
 expressions. The schema and every option are described in the
-[profile package](../packages/profile/README.md). With the
+[profile reference](reference/profile.md). With the
 [YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) installed,
 VS Code completes keys and values in `.lorequill/config.yaml` and marks mistakes while you type.
 
@@ -235,7 +235,7 @@ detached HEAD is not possible. After submitting, the status bar links to the pul
 
 ## CI
 
-The [Lorequill checks Action](../action/README.md) runs the same check engine in GitHub Actions.
+The [Lorequill checks Action](reference/ci.md) runs the same check engine in GitHub Actions.
 When `checks.engine_version` in the profile differs from the engine of your editor, the Pages
 view shows a notice, and **Show Version** lists both versions. Findings can
 then differ between editor and CI.
@@ -245,7 +245,7 @@ then differ between editor and CI.
 - **Heading anchors** follow Python-Markdown: `slugify: ascii` like MkDocs' default `toc`, and
   `slugify: unicode` like `pymdownx.slugs` in lower case. A site with a custom `slugify` or other
   extensions can produce different anchors. The site build (`mkdocs build --strict`) stays
-  authoritative. Details are in the [Markdown package](../packages/markdown/README.md#heading-anchors).
+  authoritative. Details are in the [checks reference](reference/checks.md#heading-anchors).
 - **Anchors and file names differ:** with `ascii`, `Identität` is the anchor `identitat` but the
   file name `identitaet.md`.
 - **Snippets** (`--8<--`) are not followed, and raw HTML links are not checked as links.

@@ -1,0 +1,15 @@
+# Lorequill checks its own documentation: the extension, the language server, and CI
+# (.github/workflows/ci.yml) use this profile for docs/.
+version: 1
+locale: en
+
+content:
+  root: docs
+  include: ["**/*.md"]
+
+review:
+  base_branch: main
+
+checks:
+  rules:
+    - { id: links, rule: relative-links, anchors: true, slugify: unicode }

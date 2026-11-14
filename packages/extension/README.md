@@ -29,7 +29,7 @@ In an untrusted workspace, Lorequill only explains what it would do.
 
 ## CI
 
-The [Lorequill checks Action](https://github.com/potamico/lorequill/tree/main/action) runs the same
+The [Lorequill checks Action](https://lorequill.potamico.org/reference/ci/) runs the same
 engine in GitHub Actions. Declare its engine version in the profile as `checks.engine_version`;
 the Pages view shows a notice when the editor's engine differs.
 
@@ -37,8 +37,8 @@ the Pages view shows a notice when the editor's engine differs.
 
 Lorequill collects no telemetry. It contacts GitHub only when you submit for review. Its log
 contains operational metadata only, never page content or tokens. See the
-[privacy notice](https://github.com/potamico/lorequill/blob/main/docs/privacy.md) and the
-[user guide](https://github.com/potamico/lorequill/blob/main/docs/user-guide.md).
+[privacy notice](https://lorequill.potamico.org/privacy/) and the
+[user guide](https://lorequill.potamico.org/user-guide/).
 
 ## License
 
