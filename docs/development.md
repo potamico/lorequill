@@ -194,6 +194,15 @@ npm run generate:types --workspace @lorequill/profile
 
 `npm run test:unit` fails when the committed file is stale.
 
+The extension icon `packages/extension/resources/icon.png` (256 × 256) is rendered from
+`icon.svg` next to it, because the Marketplace and Open VSX accept only PNG icons. After changing
+the SVG, render it again, for example with [CairoSVG](https://cairosvg.org/):
+
+```bash
+cairosvg packages/extension/resources/icon.svg --output-width 256 --output-height 256 \
+  -o packages/extension/resources/icon.png
+```
+
 ## Testing layout
 
 - **Unit and fixture tests:** Vitest, in `packages/<name>/test/unit/`. These must not import `vscode`.

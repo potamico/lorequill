@@ -4,6 +4,7 @@
   "description": "Structured Knowledge Documentation for Visual Studio Code",
   "version": "0.2.0",
   "publisher": "potamico",
+  "icon": "resources/icon.png",
   "private": true,
   "license": "Apache-2.0",
   "repository": {
@@ -23,6 +24,7 @@
     "git"
   ],
   "categories": [
+    "Linters",
     "Other"
   ],
   "engines": {

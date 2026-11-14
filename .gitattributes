@@ -3,6 +3,7 @@
 * text=auto eol=lf
 
 *.vsix binary
+*.png binary
 
 # The CRLF sample page keeps its Windows line endings byte for byte.
 samples/demo/docs/special/crlf.md -text

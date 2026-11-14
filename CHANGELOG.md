@@ -11,6 +11,12 @@ the check engine, the CLI, and the GitHub Action. The format follows
 
 - Documentation site at <https://lorequill.potamico.org/>, built from `docs/`, with getting started
   and references for the profile, the checks, and the CI Action.
+- Extension icon for the Marketplace, Open VSX, and the Extensions view.
+
+### Changed
+
+- The extension is listed in the Marketplace and Open VSX categories "Linters" and "Other"
+  instead of only "Other".
 
 ### Fixed
 
