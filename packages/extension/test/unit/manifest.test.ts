@@ -106,6 +106,13 @@ describe("Pages view", () => {
     expect(manifest.contributes.views.explorer).toBeUndefined();
   });
 
+  it("is tested in CI with the minimum VS Code version it declares", () => {
+    const minimum = /^\^(\d+\.\d+\.\d+)$/.exec(manifest.engines.vscode)?.[1];
+    const workflow = readFileSync(resolve(packageRoot, "../../.github/workflows/ci.yml"), "utf8");
+    expect(minimum).toBeDefined();
+    expect(workflow).toContain(`vscode: "${minimum ?? ""}"`);
+  });
+
   it("has a Lorequill view container in the activity bar with a packaged icon", () => {
     const [container] = manifest.contributes.viewsContainers?.activitybar ?? [];
     expect(container?.id).toBe("lorequill");

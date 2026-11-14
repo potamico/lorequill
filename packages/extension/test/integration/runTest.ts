@@ -25,6 +25,21 @@ function removeHostEditorEnvironment(): void {
   }
 }
 
+/**
+ * The VS Code version to test with: `LOREQUILL_VSCODE_VERSION` (`stable`, `insiders`, or an exact
+ * version such as the minimum `1.110.0` from `engines.vscode`), else the current stable release.
+ */
+function vscodeVersion(): string {
+  const requested = process.env.LOREQUILL_VSCODE_VERSION?.trim() ?? "";
+  if (requested === "") {
+    return "stable";
+  }
+  if (!/^(stable|insiders|\d+\.\d+\.\d+)$/.test(requested)) {
+    throw new Error(`LOREQUILL_VSCODE_VERSION must be stable, insiders, or x.y.z: ${requested}`);
+  }
+  return requested;
+}
+
 interface Launch {
   readonly extensionDevelopmentPath: string;
   readonly extensionTestsPath: string;
@@ -39,7 +54,7 @@ interface Launch {
  * it. The arguments below are the ones `runTests` uses, without that flag.
  */
 async function runWithWorkspaceTrust(launch: Launch): Promise<void> {
-  const executable = await downloadAndUnzipVSCode();
+  const executable = await downloadAndUnzipVSCode(vscodeVersion());
   const args = [
     launch.workspace,
     "--no-sandbox",
@@ -145,6 +160,7 @@ async function runScenario(
     });
   } else {
     await runTests({
+      version: vscodeVersion(),
       extensionDevelopmentPath,
       extensionTestsPath,
       extensionTestsEnv: { LOREQUILL_SCENARIO: scenario.name },
