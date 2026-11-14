@@ -1,3 +1,5 @@
+import { stat } from "node:fs/promises";
+import * as path from "node:path";
 import { createContentScope, loadProfile } from "@lorequill/profile";
 import * as vscode from "vscode";
 import { classifyProfileResult, type FolderStatus } from "../core/folder-status";
@@ -35,6 +37,16 @@ interface FolderEntry {
 
 /** Waiting time that merges the burst of file events of a Git operation into one refresh. */
 const REFRESH_DELAY_MS = 250;
+
+/** Size and modification time of a file, or `missing`, to tell whether it changed. */
+async function fileStamp(file: string): Promise<string> {
+  try {
+    const info = await stat(file);
+    return `${String(info.size)}:${String(info.mtimeMs)}`;
+  } catch {
+    return "missing";
+  }
+}
 
 const IGNORED_SEGMENTS: ReadonlySet<string> = new Set([".git", "node_modules"]);
 
@@ -235,8 +247,17 @@ export class FolderRegistry implements vscode.Disposable {
     }
     this.watchProfile(entry);
 
+    // A profile that changes while it is read, as when an editor empties the file before writing
+    // it, is read again instead of showing the half-written state; its change event may already
+    // have been handled.
+    const profileFile = path.join(folder.uri.fsPath, ".lorequill", "config.yaml");
+    const stamp = await fileStamp(profileFile);
     const status = classifyProfileResult(await loadProfile(folder.uri.fsPath));
     if (controller.signal.aborted) {
+      return;
+    }
+    if ((await fileStamp(profileFile)) !== stamp) {
+      this.schedule(entry, REFRESH_DELAY_MS);
       return;
     }
     this.logger.info("profile-loaded", {

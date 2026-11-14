@@ -1,5 +1,5 @@
 import * as assert from "node:assert/strict";
-import { mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import * as path from "node:path";
 import * as vscode from "vscode";
 import { profileYaml } from "../../workspaces";
@@ -42,10 +42,15 @@ suite("Pages tree (trusted workspace, one folder)", () => {
 
   teardown(async () => {
     // Restore the files the tests change, then wait until the tree is back to its start state.
-    await writeFile(
-      profilePath(),
-      profileYaml({ locale: "en", exclude: '"**/index.md", "drafts/**"' }),
-    );
+    // The profile is rewritten only when a test changed it, and atomically, so the extension
+    // never reads a half-written file.
+    const profile = profileYaml({ locale: "en", exclude: '"**/index.md", "drafts/**"' });
+    const current = await readFile(profilePath(), "utf8").catch(() => undefined);
+    if (current !== profile) {
+      const temporary = `${profilePath()}.tmp`;
+      await writeFile(temporary, profile);
+      await rename(temporary, profilePath());
+    }
     await rm(path.join(workspaceRoot(), "docs", "added.md"), { force: true });
     api.setPageFilter("");
     await waitFor(
