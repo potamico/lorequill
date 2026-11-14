@@ -9,8 +9,9 @@ runs locally and in CI.
 
 > **Status: pre-release.** The MVP features are implemented: Pages tree, page editor with live
 > preview, Properties view, page creation and links, checks in the editor and in CI, Commit with
-> its automatic check, and Submit for review on GitHub. There is no published release yet; see
-> the [changelog](CHANGELOG.md) and the [release procedure](docs/release.md).
+> its automatic check, and Submit for review on GitHub. 0.2.0 is the first release; versions stay
+> at 0.x until the MVP acceptance. See the [changelog](CHANGELOG.md) and the
+> [release procedure](docs/release.md).
 
 ## Capabilities
 
