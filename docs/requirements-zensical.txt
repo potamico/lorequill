@@ -1,0 +1,3 @@
+# Zensical, the successor of Material for MkDocs (decision D35). CI builds the site with it as a
+# preview; it does not publish.
+zensical==0.1.1

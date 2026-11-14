@@ -42,5 +42,6 @@ Thumbs.db
 !.vscode/extensions.json
 !.vscode/settings.json
 
-# The documentation site built with MkDocs (mkdocs.yml)
+# The documentation site built with MkDocs or Zensical (mkdocs.yml), and the Zensical cache
 /site/
+/.cache/

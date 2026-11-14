@@ -121,6 +121,32 @@ jobs:
       # Fails on broken links, missing anchors, and pages missing from the navigation.
       - run: mkdocs build --strict
 
+  # Builds the same site with Zensical, the successor of Material for MkDocs (decision D35), to
+  # find incompatibilities before the move. Not part of "CI passed": a failure is visible but does
+  # not block a merge. The built site is kept as an artifact for comparison.
+  zensical:
+    name: Documentation site (Zensical preview)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: docs/requirements-zensical.txt
+      - run: pip install -r docs/requirements-zensical.txt
+      # Reads mkdocs.yml; --strict fails on missing pages and anchors, like the MkDocs build.
+      - run: zensical build --strict
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: site-zensical
+          path: site
+          if-no-files-found: error
+          retention-days: 7
+
   package:
     name: Package VSIX
     runs-on: ubuntu-latest
