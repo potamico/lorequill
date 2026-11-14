@@ -29,3 +29,5 @@ samples/
 fixtures/anchors/
 /site/
 /.cache/
+/test-results/
+/playwright-report/

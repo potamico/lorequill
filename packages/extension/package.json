@@ -141,6 +141,81 @@
         "category": "Lorequill"
       },
       {
+        "command": "lorequill.editor.tableInsertRowAbove",
+        "title": "%lorequill.command.tableInsertRowAbove%",
+        "category": "%lorequill.category.table%"
+      },
+      {
+        "command": "lorequill.editor.tableInsertRowBelow",
+        "title": "%lorequill.command.tableInsertRowBelow%",
+        "category": "%lorequill.category.table%"
+      },
+      {
+        "command": "lorequill.editor.tableDeleteRow",
+        "title": "%lorequill.command.tableDeleteRow%",
+        "category": "%lorequill.category.table%"
+      },
+      {
+        "command": "lorequill.editor.tableInsertColumnLeft",
+        "title": "%lorequill.command.tableInsertColumnLeft%",
+        "category": "%lorequill.category.table%"
+      },
+      {
+        "command": "lorequill.editor.tableInsertColumnRight",
+        "title": "%lorequill.command.tableInsertColumnRight%",
+        "category": "%lorequill.category.table%"
+      },
+      {
+        "command": "lorequill.editor.tableDeleteColumn",
+        "title": "%lorequill.command.tableDeleteColumn%",
+        "category": "%lorequill.category.table%"
+      },
+      {
+        "command": "lorequill.editor.tableMoveRowUp",
+        "title": "%lorequill.command.tableMoveRowUp%",
+        "category": "%lorequill.category.table%"
+      },
+      {
+        "command": "lorequill.editor.tableMoveRowDown",
+        "title": "%lorequill.command.tableMoveRowDown%",
+        "category": "%lorequill.category.table%"
+      },
+      {
+        "command": "lorequill.editor.tableMoveColumnLeft",
+        "title": "%lorequill.command.tableMoveColumnLeft%",
+        "category": "%lorequill.category.table%"
+      },
+      {
+        "command": "lorequill.editor.tableMoveColumnRight",
+        "title": "%lorequill.command.tableMoveColumnRight%",
+        "category": "%lorequill.category.table%"
+      },
+      {
+        "command": "lorequill.editor.tableAlignLeft",
+        "title": "%lorequill.command.tableAlignLeft%",
+        "category": "%lorequill.category.table%"
+      },
+      {
+        "command": "lorequill.editor.tableAlignCenter",
+        "title": "%lorequill.command.tableAlignCenter%",
+        "category": "%lorequill.category.table%"
+      },
+      {
+        "command": "lorequill.editor.tableAlignRight",
+        "title": "%lorequill.command.tableAlignRight%",
+        "category": "%lorequill.category.table%"
+      },
+      {
+        "command": "lorequill.editor.tableFormat",
+        "title": "%lorequill.command.tableFormat%",
+        "category": "%lorequill.category.table%"
+      },
+      {
+        "command": "lorequill.editor.tableDelete",
+        "title": "%lorequill.command.tableDelete%",
+        "category": "%lorequill.category.table%"
+      },
+      {
         "command": "lorequill.outline.reveal",
         "title": "%lorequill.command.revealHeading%",
         "category": "Lorequill"
@@ -357,6 +432,66 @@
           "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
         },
         {
+          "command": "lorequill.editor.tableInsertRowAbove",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableInsertRowBelow",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableDeleteRow",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableInsertColumnLeft",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableInsertColumnRight",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableDeleteColumn",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableMoveRowUp",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableMoveRowDown",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableMoveColumnLeft",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableMoveColumnRight",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableAlignLeft",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableAlignCenter",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableAlignRight",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableFormat",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableDelete",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
           "command": "lorequill.outline.reveal",
           "when": "false"
         },
@@ -423,6 +558,83 @@
           "command": "lorequill.submit",
           "when": "scmProvider == git && lorequill.enabled && isWorkspaceTrusted",
           "group": "navigation@-9"
+        }
+      ],
+      "webview/context": [
+        {
+          "command": "lorequill.editor.tableInsertRowAbove",
+          "when": "webviewId == 'lorequill.pageEditor' && webviewSection == 'tableCell' && !tableHeader",
+          "group": "1_rows@1"
+        },
+        {
+          "command": "lorequill.editor.tableInsertRowBelow",
+          "when": "webviewId == 'lorequill.pageEditor' && webviewSection == 'tableCell'",
+          "group": "1_rows@2"
+        },
+        {
+          "command": "lorequill.editor.tableDeleteRow",
+          "when": "webviewId == 'lorequill.pageEditor' && webviewSection == 'tableCell' && !tableHeader",
+          "group": "1_rows@3"
+        },
+        {
+          "command": "lorequill.editor.tableInsertColumnLeft",
+          "when": "webviewId == 'lorequill.pageEditor' && webviewSection == 'tableCell'",
+          "group": "2_columns@1"
+        },
+        {
+          "command": "lorequill.editor.tableInsertColumnRight",
+          "when": "webviewId == 'lorequill.pageEditor' && webviewSection == 'tableCell'",
+          "group": "2_columns@2"
+        },
+        {
+          "command": "lorequill.editor.tableDeleteColumn",
+          "when": "webviewId == 'lorequill.pageEditor' && webviewSection == 'tableCell' && !tableSingleColumn",
+          "group": "2_columns@3"
+        },
+        {
+          "command": "lorequill.editor.tableMoveRowUp",
+          "when": "webviewId == 'lorequill.pageEditor' && webviewSection == 'tableCell' && !tableHeader && !tableFirstRow",
+          "group": "3_move@1"
+        },
+        {
+          "command": "lorequill.editor.tableMoveRowDown",
+          "when": "webviewId == 'lorequill.pageEditor' && webviewSection == 'tableCell' && !tableHeader && !tableLastRow",
+          "group": "3_move@2"
+        },
+        {
+          "command": "lorequill.editor.tableMoveColumnLeft",
+          "when": "webviewId == 'lorequill.pageEditor' && webviewSection == 'tableCell' && !tableFirstColumn",
+          "group": "3_move@3"
+        },
+        {
+          "command": "lorequill.editor.tableMoveColumnRight",
+          "when": "webviewId == 'lorequill.pageEditor' && webviewSection == 'tableCell' && !tableLastColumn",
+          "group": "3_move@4"
+        },
+        {
+          "command": "lorequill.editor.tableAlignLeft",
+          "when": "webviewId == 'lorequill.pageEditor' && webviewSection == 'tableCell'",
+          "group": "4_align@1"
+        },
+        {
+          "command": "lorequill.editor.tableAlignCenter",
+          "when": "webviewId == 'lorequill.pageEditor' && webviewSection == 'tableCell'",
+          "group": "4_align@2"
+        },
+        {
+          "command": "lorequill.editor.tableAlignRight",
+          "when": "webviewId == 'lorequill.pageEditor' && webviewSection == 'tableCell'",
+          "group": "4_align@3"
+        },
+        {
+          "command": "lorequill.editor.tableFormat",
+          "when": "webviewId == 'lorequill.pageEditor' && webviewSection == 'tableCell'",
+          "group": "5_table@1"
+        },
+        {
+          "command": "lorequill.editor.tableDelete",
+          "when": "webviewId == 'lorequill.pageEditor' && webviewSection == 'tableCell'",
+          "group": "5_table@2"
         }
       ]
     },

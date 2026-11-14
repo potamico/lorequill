@@ -15,21 +15,28 @@ import {
   type AdmonitionHeader,
 } from "../admonition-syntax";
 import { toggleTask } from "../formatting";
-import { renderPreview } from "../render";
-import { cellPosition, findTables, type TableBlock } from "../table-grid";
+import { findTables, type TableBlock } from "../table-grid";
+import { enterTable, TableGridWidget } from "./table-grid-view";
 
 /**
  * Basic live-preview decorations (specification §8): Markdown syntax of headings, emphasis,
  * strikethrough, inline code, and links is hidden unless the cursor or selection is on it; bullet
  * markers are shown as bullets; quote markers, horizontal rules, and code fences are hidden
  * outside the cursor; headings, lists, quotes, and code blocks get line classes for the reading
- * layout; tables are shown as a grid outside the cursor; the front matter is hidden behind a
+ * layout; tables are shown as editable grids; the front matter is hidden behind a
  * compact line. Decorations only change the display:
  * the document text is never modified.
  */
 
 function touches(state: EditorState, from: number, to: number): boolean {
   return state.selection.ranges.some((range) => range.from <= to && range.to >= from);
+}
+
+/** Whether a non-empty selection covers part of the range. */
+function selects(state: EditorState, from: number, to: number): boolean {
+  return state.selection.ranges.some(
+    (range) => !range.empty && range.from <= to && range.to >= from,
+  );
 }
 
 function onCursorLine(state: EditorState, from: number, to: number): boolean {
@@ -258,7 +265,7 @@ function buildInline(view: EditorView): DecorationSet {
             decorations.push(line.range(state.doc.lineAt(node.from).from));
           }
         }
-        if (name === "Table" && !touches(state, node.from, node.to)) {
+        if (name === "Table" && !selects(state, node.from, node.to)) {
           // Shown as a grid by `tableGrid`.
           return false;
         }
@@ -413,79 +420,23 @@ const inlinePreview = ViewPlugin.fromClass(
   { decorations: (plugin) => plugin.decorations },
 );
 
-/**
- * A table shown as a grid, rendered like the preview. A click puts the cursor into the clicked
- * cell, which reveals the Markdown source; Ctrl+click on a link opens it.
- */
-class TableWidget extends WidgetType {
-  constructor(
-    private readonly source: string,
-    private readonly rows: number,
-    private readonly onOpenLink: (target: string) => void,
-  ) {
-    super();
-  }
-  override eq(other: TableWidget): boolean {
-    return other.source === this.source;
-  }
-  override get estimatedHeight(): number {
-    return this.rows * 30;
-  }
-  toDOM(view: EditorView): HTMLElement {
-    const grid = document.createElement("div");
-    grid.className = "cm-lq-table";
-    // Sanitized by the renderer: no raw HTML, scripts, or remote content (§15).
-    grid.innerHTML = renderPreview(this.source);
-    grid.addEventListener("mousedown", (event) => {
-      if (event.button !== 0 || !(event.target instanceof Element)) {
-        return;
-      }
-      event.preventDefault();
-      const link = event.target.closest<HTMLElement>("[data-lq-href]");
-      const target = link?.dataset.lqHref;
-      if ((event.ctrlKey || event.metaKey) && target) {
-        this.onOpenLink(target);
-        return;
-      }
-      view.dispatch({ selection: { anchor: this.positionOf(view, grid, event.target) } });
-      view.focus();
-    });
-    return grid;
-  }
-  /** The source position of the clicked cell; the widget may have moved since it was drawn. */
-  private positionOf(view: EditorView, grid: HTMLElement, target: Element): number {
-    const from = view.posAtDOM(grid);
-    const table = findTables(view.state).find((candidate) => candidate.from === from);
-    const cell = target.closest("td, th");
-    if (!table || !(cell instanceof HTMLTableCellElement) || !cell.parentElement) {
-      return from;
-    }
-    const row = Array.from(grid.querySelectorAll("tr")).indexOf(
-      cell.parentElement as HTMLTableRowElement,
-    );
-    return cellPosition(view.state, table, row, cell.cellIndex);
-  }
-  override ignoreEvent(): boolean {
-    return true;
-  }
-}
-
 interface TableGrid {
   readonly tables: readonly TableBlock[];
   readonly decorations: DecorationSet;
 }
 
 /**
- * Shows each top-level table as a grid unless the cursor or selection is in it. Block widgets
- * must come from a state field. The table list is kept between cursor moves, so moving the
- * cursor costs no tree walk.
+ * Shows each top-level table as an editable grid (`table-grid-view`). Only a selection that
+ * covers part of a table, such as a search match, shows its source. Block widgets must come from
+ * a state field. The table list is kept between cursor moves, so moving the cursor costs no tree
+ * walk.
  */
 function tableGrid(onOpenLink: (target: string) => void): StateField<TableGrid> {
   const build = (state: EditorState, tables: readonly TableBlock[]): TableGrid => {
     const builder = new RangeSetBuilder<Decoration>();
     for (const table of tables) {
-      if (!touches(state, table.from, table.to)) {
-        const widget = new TableWidget(
+      if (!selects(state, table.from, table.to)) {
+        const widget = new TableGridWidget(
           state.sliceDoc(table.from, table.to),
           table.cells.length,
           onOpenLink,
@@ -586,6 +537,7 @@ export function livePreview(
     EditorView.lineWrapping,
     inlinePreview,
     tableGrid(onOpenLink),
+    enterTable,
     frontMatterField(frontMatterLabel, onFrontMatter),
   ];
 }

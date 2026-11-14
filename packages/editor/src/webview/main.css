@@ -781,3 +781,80 @@ body[data-mode="view"] #editor {
   text-decoration: none;
   font-weight: 600;
 }
+
+/* Table tools menu below the table button (§8). */
+.lq-menu {
+  position: fixed;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  padding: 4px;
+  border: 1px solid var(--vscode-menu-border, var(--vscode-widget-border, transparent));
+  border-radius: 4px;
+  background-color: var(--vscode-menu-background, var(--vscode-editorWidget-background));
+  color: var(--vscode-menu-foreground, var(--vscode-foreground));
+  box-shadow: 0 2px 8px var(--vscode-widget-shadow, rgba(0, 0, 0, 0.36));
+}
+
+.lq-menu-item {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 3px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lq-menu-item:hover:not(:disabled),
+.lq-menu-item:focus-visible {
+  outline: none;
+  background-color: var(
+    --vscode-menu-selectionBackground,
+    var(--vscode-list-activeSelectionBackground)
+  );
+  color: var(--vscode-menu-selectionForeground, var(--vscode-list-activeSelectionForeground));
+}
+
+.lq-menu-item:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.lq-menu-separator {
+  height: 1px;
+  margin: 4px 0;
+  background-color: var(
+    --vscode-menu-separatorBackground,
+    var(--vscode-widget-border, transparent)
+  );
+}
+
+/* Editable table grid in Edit (§8): a click edits a cell, which shows its Markdown in an input. */
+.cm-lq-table th,
+.cm-lq-table td {
+  cursor: text;
+  min-width: 3em;
+}
+
+.cm-lq-table th:focus-within,
+.cm-lq-table td:focus-within {
+  outline: 2px solid var(--vscode-focusBorder);
+  outline-offset: -2px;
+}
+
+.cm-lq-cell-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 3ch;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font-family: var(--vscode-editor-font-family);
+  font-size: 0.92em;
+  font-weight: normal;
+}

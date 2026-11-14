@@ -45,3 +45,7 @@ Thumbs.db
 # The documentation site built with MkDocs or Zensical (mkdocs.yml), and the Zensical cache
 /site/
 /.cache/
+
+# Playwright webview tests (playwright.config.mts)
+/test-results/
+/playwright-report/
