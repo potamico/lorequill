@@ -1,0 +1,104 @@
+# Showcase profile for trying the extension with "Run Extension" (F5) and for manual tests.
+# Every page under docs/ passes all checks; CI runs the Checks Action on this folder and expects
+# no findings. Deliberate findings live in samples/findings.
+#
+# It uses every check rule and every field widget. Tests in packages/checks and packages/editor
+# keep it complete: a new rule, widget, or highlighted code language must appear here.
+version: 1
+locale: en
+
+content:
+  root: docs
+  include: ["**/*.md"]
+  exclude: ["archive/**"]
+  # Checked, but not published (draft_docs in mkdocs.yml); only drafts may link here.
+  drafts: ["drafts/**"]
+
+review:
+  base_branch: main
+
+# Stable links for Copy Stable Link; docs/examples/mkdocs has the matching MkDocs hook.
+site:
+  url: https://docs.example.org/
+  stable_links: { field: id, path: "id/{value}/" }
+
+checks:
+  timeout_seconds: 30
+  rules:
+    - { id: links, rule: relative-links, anchors: true, slugify: unicode }
+    - { id: wikilinks, rule: forbidden-text, text: "[[" }
+    - { id: unique-ids, rule: unique-field, field: id }
+    - id: relations
+      rule: allow-values
+      marker: "rel:"
+      values: [related, supports, contradicts, implements]
+    - id: concept-ids
+      rule: field-format
+      when: { field: type, in: [concept] }
+      field: id
+      prefixes: [BOK]
+    - id: decision-ids
+      rule: field-format
+      when: { field: type, in: [decision] }
+      field: id
+      prefixes: [DEC, ADR]
+    # A retired term names the id of its successor (see docs/user-guide.md, "Retiring pages").
+    - id: successors
+      rule: reference-field
+      when: { field: lifecycle, in: [Retired] }
+      field: replaced_by
+      target: id
+      required: true
+
+collections:
+  - id: concept
+    label: Term
+    folder: terms
+    match: { field: type, equals: concept }
+    template: |
+      # {title}
+
+      ## Definition
+
+      ## Scope
+
+      ## Relations
+    fields:
+      - { key: title, label: Title, widget: string, required: true }
+      - { key: type, widget: hidden, default: concept }
+      - { key: id, label: ID, widget: string, required: true }
+      - key: lifecycle
+        label: Lifecycle
+        widget: select
+        default: Draft
+        options: [Draft, "In Review", Approved, Retired]
+      # A retired term stays as a page with lifecycle Retired, so its id is never reused.
+      - { key: replaced_by, label: Replaced by, widget: string }
+      - { key: summary, label: Summary, widget: text }
+      - { key: reviewed, label: Reviewed, widget: boolean, default: false }
+      - { key: review_date, label: Reviewed on, widget: date }
+      - { key: aliases, label: Aliases, widget: list }
+
+  - id: decision
+    label: Decision
+    folder: decisions
+    match: { field: type, equals: decision }
+    template: |
+      # {title}
+
+      ## Context
+
+      ## Decision
+
+      ## Consequences
+    fields:
+      - { key: title, label: Title, widget: string, required: true }
+      - { key: type, widget: hidden, default: decision }
+      - { key: id, label: ID, widget: string, required: true }
+      - key: status
+        label: Status
+        widget: select
+        default: Proposed
+        options: [Proposed, Accepted, Superseded, Withdrawn]
+      - { key: decided, label: Decided on, widget: date }
+      - { key: tags, label: Tags, widget: list, default: [architecture] }

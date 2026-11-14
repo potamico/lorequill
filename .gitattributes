@@ -1,0 +1,8 @@
+# Keep LF line endings in the working tree on every platform. Prettier, ESLint, and the exact
+# bytes of the Markdown fixtures depend on it, and Windows checkouts must not convert them.
+* text=auto eol=lf
+
+*.vsix binary
+
+# The CRLF sample page keeps its Windows line endings byte for byte.
+samples/demo/docs/special/crlf.md -text

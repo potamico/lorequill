@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+!/action/dist/
+out/
+*.tsbuildinfo
+*.vsix
+# Copied from the repository root when the VSIX is packaged.
+/packages/extension/LICENSE
+/packages/extension/NOTICE
+
+# Python environment and the demo site built with MkDocs
+.venv/
+__pycache__/
+/samples/demo/site/
+
+# VS Code test downloads
+.vscode-test/
+
+# Test and coverage output
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+
+# Keep shared VS Code workspace configuration, ignore the rest
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/extensions.json
+!.vscode/settings.json

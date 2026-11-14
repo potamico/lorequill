@@ -1,0 +1,8 @@
+Lorequill
+Copyright 2026 The Lorequill contributors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Distributed bundles include third-party software under their own licenses. The
+VSIX lists it in dist/THIRD_PARTY_NOTICES.txt and the GitHub Action in
+action/dist/THIRD_PARTY_NOTICES.txt.

@@ -1,0 +1,80 @@
+diff --git a/node_modules/micromark/dev/lib/initialize/document.js b/node_modules/micromark/dev/lib/initialize/document.js
+index d33c77b..e080e18 100644
+--- a/node_modules/micromark/dev/lib/initialize/document.js
++++ b/node_modules/micromark/dev/lib/initialize/document.js
+@@ -128,12 +128,11 @@ function initializeDocument(effects) {
+         index++
+       }
+ 
+-      const editMap = new EditMap()
+-      // Inject the exits earlier (they’re still also at the end).
+-      editMap.add(indexBeforeFlow + 1, 0, self.events.slice(indexBeforeExits))
+-      // Discard the duplicate exits.
+-      editMap.add(indexBeforeExits, index - indexBeforeExits, [])
+-      editMap.consume(self.events)
++      // Move the exits earlier, changing only the end of the events: rebuilding the whole
++      // list for every closed container is quadratic in the number of containers.
++      const exits = self.events.slice(indexBeforeExits)
++      self.events.length = indexBeforeExits
++      self.events.splice(indexBeforeFlow + 1, 0, ...exits)
+ 
+       return checkNewContainers(code)
+     }
+@@ -381,12 +380,11 @@ function initializeDocument(effects) {
+         index++
+       }
+ 
+-      const editMap = new EditMap()
+-      // Inject the exits earlier (they’re still also at the end).
+-      editMap.add(indexBeforeFlow + 1, 0, self.events.slice(indexBeforeExits))
+-      // Discard the duplicate exits.
+-      editMap.add(indexBeforeExits, index - indexBeforeExits, [])
+-      editMap.consume(self.events)
++      // Move the exits earlier, changing only the end of the events: rebuilding the whole
++      // list for every closed container is quadratic in the number of containers.
++      const exits = self.events.slice(indexBeforeExits)
++      self.events.length = indexBeforeExits
++      self.events.splice(indexBeforeFlow + 1, 0, ...exits)
+     }
+   }
+ 
+diff --git a/node_modules/micromark/lib/initialize/document.js b/node_modules/micromark/lib/initialize/document.js
+index 0089c91..c6d0322 100644
+--- a/node_modules/micromark/lib/initialize/document.js
++++ b/node_modules/micromark/lib/initialize/document.js
+@@ -108,12 +108,11 @@ function initializeDocument(effects) {
+         };
+         index++;
+       }
+-      const editMap = new EditMap();
+-      // Inject the exits earlier (they’re still also at the end).
+-      editMap.add(indexBeforeFlow + 1, 0, self.events.slice(indexBeforeExits));
+-      // Discard the duplicate exits.
+-      editMap.add(indexBeforeExits, index - indexBeforeExits, []);
+-      editMap.consume(self.events);
++      // Move the exits earlier, changing only the end of the events: rebuilding the whole
++      // list for every closed container is quadratic in the number of containers.
++      const exits = self.events.slice(indexBeforeExits);
++      self.events.length = indexBeforeExits;
++      self.events.splice(indexBeforeFlow + 1, 0, ...exits);
+       return checkNewContainers(code);
+     }
+     return start(code);
+@@ -323,12 +322,11 @@ function initializeDocument(effects) {
+         };
+         index++;
+       }
+-      const editMap = new EditMap();
+-      // Inject the exits earlier (they’re still also at the end).
+-      editMap.add(indexBeforeFlow + 1, 0, self.events.slice(indexBeforeExits));
+-      // Discard the duplicate exits.
+-      editMap.add(indexBeforeExits, index - indexBeforeExits, []);
+-      editMap.consume(self.events);
++      // Move the exits earlier, changing only the end of the events: rebuilding the whole
++      // list for every closed container is quadratic in the number of containers.
++      const exits = self.events.slice(indexBeforeExits);
++      self.events.length = indexBeforeExits;
++      self.events.splice(indexBeforeFlow + 1, 0, ...exits);
+     }
+   }
+ 

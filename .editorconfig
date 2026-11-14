@@ -1,0 +1,27 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+# Trailing double spaces can be meaningful line breaks in Markdown.
+trim_trailing_whitespace = false
+
+[fixtures/markdown/**]
+# Fixtures are byte-exact test inputs.
+trim_trailing_whitespace = false
+insert_final_newline = unset
+
+[LICENSE]
+indent_style = unset
+indent_size = unset
+trim_trailing_whitespace = false
+insert_final_newline = unset
+
+[Makefile]
+indent_style = tab

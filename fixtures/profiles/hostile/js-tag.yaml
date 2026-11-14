@@ -1,0 +1,4 @@
+version: 1
+content:
+  root: !!js/function "function () { return 'docs'; }"
+  include: ["**/*.md"]

@@ -1,0 +1,27 @@
+{
+  "name": "@lorequill/profile",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Lorequill repository profile: closed JSON Schema, generated types, validator, and loader",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate:types": "node scripts/generate-types.mjs",
+    "check:types": "node scripts/generate-types.mjs --check",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "ajv": "8.20.0",
+    "picomatch": "4.0.7",
+    "yaml": "2.9.1"
+  },
+  "devDependencies": {
+    "@types/picomatch": "4.0.3",
+    "json-schema-to-typescript": "16.0.0"
+  }
+}

@@ -1,0 +1,31 @@
+name: Lorequill checks
+description: Checks Markdown documentation with the repository's Lorequill profile, without running repository code.
+author: Lorequill contributors
+branding:
+  icon: check-square
+  color: blue
+inputs:
+  path:
+    description: Repository directory to check, relative to the workspace.
+    required: false
+    default: "."
+  sarif-file:
+    description: Also write the findings as SARIF 2.1.0 to this file, for upload with github/codeql-action/upload-sarif.
+    required: false
+    default: ""
+  fail-on-findings:
+    description: Fail the step when the checks find problems. An incomplete check always fails.
+    required: false
+    default: "true"
+outputs:
+  engine-version:
+    description: Version of the check engine that ran.
+  status:
+    description: passed, failed, or error.
+  findings:
+    description: Number of findings.
+  sarif-file:
+    description: Absolute path of the SARIF file, when one was written.
+runs:
+  using: node24
+  main: dist/index.cjs

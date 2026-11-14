@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "${workspaceFolder}/samples/demo",
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/extension"
+      ],
+      "outFiles": ["${workspaceFolder}/packages/extension/dist/**/*.js"],
+      "preLaunchTask": "build-extension"
+    },
+    {
+      "name": "Run Extension (both samples)",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "${workspaceFolder}/samples/lorequill.code-workspace",
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/extension"
+      ],
+      "outFiles": ["${workspaceFolder}/packages/extension/dist/**/*.js"],
+      "preLaunchTask": "build-extension"
+    }
+  ]
+}

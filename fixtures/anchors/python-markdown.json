@@ -1,0 +1,516 @@
+{
+  "generator": "packages/markdown/scripts/anchors/generate.py",
+  "versions": {
+    "python": "3.14.4",
+    "markdown": "3.11.3",
+    "pymdown-extensions": "13.1"
+  },
+  "extensions": [
+    "toc",
+    "attr_list",
+    "admonition",
+    "pymdownx.details",
+    "pymdownx.superfences",
+    "pymdownx.tabbed"
+  ],
+  "cases": [
+    {
+      "name": "Hello World",
+      "markdown": "# Hello World\n",
+      "ascii": [
+        "hello-world"
+      ],
+      "unicode": [
+        "hello-world"
+      ]
+    },
+    {
+      "name": "Identität & Rollen",
+      "markdown": "# Identität & Rollen\n",
+      "ascii": [
+        "identitat-rollen"
+      ],
+      "unicode": [
+        "identität--rollen"
+      ]
+    },
+    {
+      "name": "Ärger über Öl",
+      "markdown": "# Ärger über Öl\n",
+      "ascii": [
+        "arger-uber-ol"
+      ],
+      "unicode": [
+        "ärger-über-öl"
+      ]
+    },
+    {
+      "name": "Straße",
+      "markdown": "# Straße\n",
+      "ascii": [
+        "strae"
+      ],
+      "unicode": [
+        "straße"
+      ]
+    },
+    {
+      "name": "Émile Zola",
+      "markdown": "# Émile Zola\n",
+      "ascii": [
+        "emile-zola"
+      ],
+      "unicode": [
+        "émile-zola"
+      ]
+    },
+    {
+      "name": "Ünïcödé",
+      "markdown": "# Ünïcödé\n",
+      "ascii": [
+        "unicode"
+      ],
+      "unicode": [
+        "ünïcödé"
+      ]
+    },
+    {
+      "name": "Ελληνικά κείμενα",
+      "markdown": "# Ελληνικά κείμενα\n",
+      "ascii": [
+        "_1"
+      ],
+      "unicode": [
+        "ελληνικά-κείμενα"
+      ]
+    },
+    {
+      "name": "日本語の見出し",
+      "markdown": "# 日本語の見出し\n",
+      "ascii": [
+        "_1"
+      ],
+      "unicode": [
+        "日本語の見出し"
+      ]
+    },
+    {
+      "name": "C++ / C# / F#",
+      "markdown": "# C++ / C# / F#\n",
+      "ascii": [
+        "c-c-f"
+      ],
+      "unicode": [
+        "c--c--f"
+      ]
+    },
+    {
+      "name": "100% sure!",
+      "markdown": "# 100% sure!\n",
+      "ascii": [
+        "100-sure"
+      ],
+      "unicode": [
+        "100-sure"
+      ]
+    },
+    {
+      "name": "--Dashes--",
+      "markdown": "# --Dashes--\n",
+      "ascii": [
+        "-dashes-"
+      ],
+      "unicode": [
+        "--dashes--"
+      ]
+    },
+    {
+      "name": "under_score",
+      "markdown": "# under_score\n",
+      "ascii": [
+        "under_score"
+      ],
+      "unicode": [
+        "under_score"
+      ]
+    },
+    {
+      "name": "Mixed CASE Words",
+      "markdown": "# Mixed CASE Words\n",
+      "ascii": [
+        "mixed-case-words"
+      ],
+      "unicode": [
+        "mixed-case-words"
+      ]
+    },
+    {
+      "name": "Dots.in.name",
+      "markdown": "# Dots.in.name\n",
+      "ascii": [
+        "dotsinname"
+      ],
+      "unicode": [
+        "dotsinname"
+      ]
+    },
+    {
+      "name": "Apostrophe's test",
+      "markdown": "# Apostrophe's test\n",
+      "ascii": [
+        "apostrophes-test"
+      ],
+      "unicode": [
+        "apostrophes-test"
+      ]
+    },
+    {
+      "name": "Quotes \"double\"",
+      "markdown": "# Quotes \"double\"\n",
+      "ascii": [
+        "quotes-double"
+      ],
+      "unicode": [
+        "quotes-double"
+      ]
+    },
+    {
+      "name": "a/b\\c",
+      "markdown": "# a/b\\c\n",
+      "ascii": [
+        "abc"
+      ],
+      "unicode": [
+        "abc"
+      ]
+    },
+    {
+      "name": "1. Numbered",
+      "markdown": "# 1. Numbered\n",
+      "ascii": [
+        "1-numbered"
+      ],
+      "unicode": [
+        "1-numbered"
+      ]
+    },
+    {
+      "name": "Tab\there",
+      "markdown": "# Tab\there\n",
+      "ascii": [
+        "tab-here"
+      ],
+      "unicode": [
+        "tab-here"
+      ]
+    },
+    {
+      "name": "Multiple   spaces",
+      "markdown": "# Multiple   spaces\n",
+      "ascii": [
+        "multiple-spaces"
+      ],
+      "unicode": [
+        "multiple-spaces"
+      ]
+    },
+    {
+      "name": "Non breaking",
+      "markdown": "# Non breaking\n",
+      "ascii": [
+        "non-breaking"
+      ],
+      "unicode": [
+        "non-breaking"
+      ]
+    },
+    {
+      "name": "Emoji 🎉 party",
+      "markdown": "# Emoji 🎉 party\n",
+      "ascii": [
+        "emoji-party"
+      ],
+      "unicode": [
+        "emoji--party"
+      ]
+    },
+    {
+      "name": "!!!",
+      "markdown": "# !!!\n",
+      "ascii": [
+        "_1"
+      ],
+      "unicode": [
+        "_1"
+      ]
+    },
+    {
+      "name": "Hello *emphasis* and **strong**",
+      "markdown": "# Hello *emphasis* and **strong**\n",
+      "ascii": [
+        "hello-emphasis-and-strong"
+      ],
+      "unicode": [
+        "hello-emphasis-and-strong"
+      ]
+    },
+    {
+      "name": "The `foo()` function",
+      "markdown": "# The `foo()` function\n",
+      "ascii": [
+        "the-foo-function"
+      ],
+      "unicode": [
+        "the-foo-function"
+      ]
+    },
+    {
+      "name": "A [link](page.md) inside",
+      "markdown": "# A [link](page.md) inside\n",
+      "ascii": [
+        "a-link-inside"
+      ],
+      "unicode": [
+        "a-link-inside"
+      ]
+    },
+    {
+      "name": "An ![image](pic.png) inside",
+      "markdown": "# An ![image](pic.png) inside\n",
+      "ascii": [
+        "an-inside"
+      ],
+      "unicode": [
+        "an-inside"
+      ]
+    },
+    {
+      "name": "Inline <em>html</em> tag",
+      "markdown": "# Inline <em>html</em> tag\n",
+      "ascii": [
+        "inline-html-tag"
+      ],
+      "unicode": [
+        "inline-html-tag"
+      ]
+    },
+    {
+      "name": "Entity &amp; reference",
+      "markdown": "# Entity &amp; reference\n",
+      "ascii": [
+        "entity-reference"
+      ],
+      "unicode": [
+        "entity--reference"
+      ]
+    },
+    {
+      "name": "Escaped \\*stars\\*",
+      "markdown": "# Escaped \\*stars\\*\n",
+      "ascii": [
+        "escaped-stars"
+      ],
+      "unicode": [
+        "escaped-stars"
+      ]
+    },
+    {
+      "name": "Trailing hashes ##",
+      "markdown": "# Trailing hashes ##\n",
+      "ascii": [
+        "trailing-hashes"
+      ],
+      "unicode": [
+        "trailing-hashes"
+      ]
+    },
+    {
+      "name": "Title {#custom-id}",
+      "markdown": "# Title {#custom-id}\n",
+      "ascii": [
+        "custom-id"
+      ],
+      "unicode": [
+        "custom-id"
+      ]
+    },
+    {
+      "name": "Title { #spaced-id }",
+      "markdown": "# Title { #spaced-id }\n",
+      "ascii": [
+        "spaced-id"
+      ],
+      "unicode": [
+        "spaced-id"
+      ]
+    },
+    {
+      "name": "Title {: #colon-id .cls }",
+      "markdown": "# Title {: #colon-id .cls }\n",
+      "ascii": [
+        "colon-id"
+      ],
+      "unicode": [
+        "colon-id"
+      ]
+    },
+    {
+      "name": "Title {: .only-class }",
+      "markdown": "# Title {: .only-class }\n",
+      "ascii": [
+        "title"
+      ],
+      "unicode": [
+        "title"
+      ]
+    },
+    {
+      "name": "Ends with dash -",
+      "markdown": "# Ends with dash -\n",
+      "ascii": [
+        "ends-with-dash-"
+      ],
+      "unicode": [
+        "ends-with-dash--"
+      ]
+    },
+    {
+      "name": "Wörter-mit-Bindestrich",
+      "markdown": "# Wörter-mit-Bindestrich\n",
+      "ascii": [
+        "worter-mit-bindestrich"
+      ],
+      "unicode": [
+        "wörter-mit-bindestrich"
+      ]
+    },
+    {
+      "name": "Numbers 2026 and year",
+      "markdown": "# Numbers 2026 and year\n",
+      "ascii": [
+        "numbers-2026-and-year"
+      ],
+      "unicode": [
+        "numbers-2026-and-year"
+      ]
+    },
+    {
+      "name": "duplicates",
+      "markdown": "# Foo\n\n## Foo\n\n### Foo\n",
+      "ascii": [
+        "foo",
+        "foo_1",
+        "foo_2"
+      ],
+      "unicode": [
+        "foo",
+        "foo_1",
+        "foo_2"
+      ]
+    },
+    {
+      "name": "duplicate-suffix-collision",
+      "markdown": "# Foo\n\n# Foo_1\n\n# Foo\n",
+      "ascii": [
+        "foo",
+        "foo_1",
+        "foo_2"
+      ],
+      "unicode": [
+        "foo",
+        "foo_1",
+        "foo_2"
+      ]
+    },
+    {
+      "name": "explicit-id-collides-with-later-heading",
+      "markdown": "# First {#bar}\n\n# Bar\n",
+      "ascii": [
+        "bar",
+        "bar_1"
+      ],
+      "unicode": [
+        "bar",
+        "bar_1"
+      ]
+    },
+    {
+      "name": "explicit-id-collides-with-earlier-heading",
+      "markdown": "# Bar\n\n# Second {#bar}\n",
+      "ascii": [
+        "bar_1",
+        "bar"
+      ],
+      "unicode": [
+        "bar_1",
+        "bar"
+      ]
+    },
+    {
+      "name": "setext",
+      "markdown": "Setext One\n==========\n\nSetext Two\n----------\n",
+      "ascii": [
+        "setext-one",
+        "setext-two"
+      ],
+      "unicode": [
+        "setext-one",
+        "setext-two"
+      ]
+    },
+    {
+      "name": "admonition",
+      "markdown": "!!! note \"Note\"\n    ## Inside Admonition\n\n    Text.\n\n## After\n",
+      "ascii": [
+        "inside-admonition",
+        "after"
+      ],
+      "unicode": [
+        "inside-admonition",
+        "after"
+      ]
+    },
+    {
+      "name": "details",
+      "markdown": "??? tip \"More\"\n    ## Inside Details\n",
+      "ascii": [
+        "inside-details"
+      ],
+      "unicode": [
+        "inside-details"
+      ]
+    },
+    {
+      "name": "tabs",
+      "markdown": "=== \"Tab A\"\n\n    ## Inside Tab\n\n=== \"Tab B\"\n\n    Text.\n",
+      "ascii": [
+        "inside-tab"
+      ],
+      "unicode": [
+        "inside-tab"
+      ]
+    },
+    {
+      "name": "code-is-ignored",
+      "markdown": "```\n# Not a heading\n```\n\n# Real\n",
+      "ascii": [
+        "real"
+      ],
+      "unicode": [
+        "real"
+      ]
+    },
+    {
+      "name": "empty-heading-text",
+      "markdown": "# !!!\n\n# ???\n",
+      "ascii": [
+        "_1",
+        "_2"
+      ],
+      "unicode": [
+        "_1",
+        "_2"
+      ]
+    }
+  ]
+}

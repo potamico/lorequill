@@ -1,0 +1,34 @@
+# Deliberate findings: every page except index.md and the draft breaks one check rule, so that the Problems
+# view, Check Pages, the commit check, and the CLI can be tried without editing pages first.
+# packages/checks/test/unit/samples.test.ts pins the exact findings; update it with this folder.
+#
+# Open both samples together with samples/lorequill.code-workspace.
+version: 1
+locale: en
+
+content:
+  root: docs
+  include: ["**/*.md"]
+  # Checked, but not published: links.md must not link here; the draft may link back.
+  drafts: ["drafts/**"]
+
+checks:
+  rules:
+    - { id: links, rule: relative-links, anchors: true, slugify: ascii }
+    - { id: wikilinks, rule: forbidden-text, text: "[[" }
+    - { id: unique-ids, rule: unique-field, field: id }
+    - id: relations
+      rule: allow-values
+      marker: "rel:"
+      values: [related, supports]
+    - id: decision-ids
+      rule: field-format
+      when: { field: type, in: [decision] }
+      field: id
+      prefixes: [DEC]
+    - id: successors
+      rule: reference-field
+      when: { field: lifecycle, in: [Retired] }
+      field: replaced_by
+      target: id
+      required: true

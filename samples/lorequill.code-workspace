@@ -1,0 +1,11 @@
+{
+  "folders": [
+    { "name": "demo", "path": "demo" },
+    { "name": "findings", "path": "findings" }
+  ],
+  "settings": {},
+  "extensions": {
+    // Completes and checks .lorequill/config.yaml with the schema that Lorequill contributes.
+    "recommendations": ["redhat.vscode-yaml"]
+  }
+}

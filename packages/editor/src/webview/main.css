@@ -1,0 +1,783 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--vscode-editor-background);
+  color: var(--vscode-editor-foreground);
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+}
+
+/* Shared by the live preview of the editor and the rendered preview, so both look alike. */
+:root {
+  --lq-gutter: 32px;
+  --lq-rule: var(--vscode-widget-border, var(--vscode-editorWidget-border));
+  --lq-quote-bar: var(--vscode-textBlockQuote-border, var(--vscode-textLink-foreground));
+  --lq-quote-background: var(--vscode-textBlockQuote-background, transparent);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+#toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-bottom: 1px solid
+    var(--vscode-editorGroup-border, var(--vscode-widget-border, transparent));
+  background-color: var(--vscode-editor-background);
+}
+
+.lq-group {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding-right: 6px;
+  margin-right: 2px;
+  border-right: 1px solid var(--vscode-widget-border, transparent);
+}
+
+.lq-group:last-child {
+  border-right: none;
+}
+
+.lq-spacer {
+  flex: 1;
+}
+
+.lq-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 4px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--vscode-icon-foreground, var(--vscode-foreground));
+  cursor: pointer;
+}
+
+.lq-text-button {
+  font-family: var(--vscode-font-family);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.lq-button:hover {
+  background-color: var(--vscode-toolbar-hoverBackground);
+}
+
+.lq-button:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
+}
+
+.lq-button[aria-pressed="true"] {
+  background-color: var(--vscode-inputOption-activeBackground);
+  border-color: var(--vscode-inputOption-activeBorder, transparent);
+  color: var(--vscode-inputOption-activeForeground, inherit);
+}
+
+.lq-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.lq-button:disabled:hover {
+  background: transparent;
+}
+
+/* Segmented view-mode control (§8). */
+.lq-segmented .lq-button {
+  padding: 0 8px;
+  font-weight: 400;
+}
+
+#workspace {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+#editor {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+#preview {
+  display: none;
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  outline: none;
+}
+
+body[data-mode="both"] #preview {
+  display: block;
+  border-left: 1px solid var(--vscode-editorGroup-border, var(--vscode-widget-border, transparent));
+}
+
+body[data-mode="view"] #preview {
+  display: block;
+}
+
+body[data-mode="view"] #editor {
+  display: none;
+}
+
+#editor .cm-editor {
+  height: 100%;
+}
+
+/* Rendered preview of `Both` and `Preview`: an approximation of the site (§8). */
+.lq-approximation {
+  margin: 0;
+  padding: 4px var(--lq-gutter);
+  font-size: 0.85em;
+  color: var(--vscode-descriptionForeground);
+  border-bottom: 1px solid var(--vscode-widget-border, transparent);
+}
+
+.lq-preview-body {
+  box-sizing: border-box;
+  max-width: var(--lorequill-max-width, none);
+  margin: 0 auto;
+  padding: 16px var(--lq-gutter) 48px;
+  font-family: var(--vscode-font-family);
+  font-size: calc(var(--lorequill-font-size, 14px) * 1.1);
+  line-height: 1.75;
+  overflow-wrap: break-word;
+}
+
+.lq-preview-body h1,
+.lq-preview-body h2,
+.lq-preview-body h3,
+.lq-preview-body h4,
+.lq-preview-body h5,
+.lq-preview-body h6 {
+  margin: 1em 0 0.4em;
+  line-height: 1.3;
+}
+
+.lq-preview-body h1 {
+  font-size: 1.85em;
+}
+
+.lq-preview-body h2 {
+  font-size: 1.5em;
+}
+
+.lq-preview-body h3 {
+  font-size: 1.25em;
+}
+
+.lq-preview-body h1,
+.lq-preview-body h2 {
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--lq-rule);
+}
+
+.lq-preview-body p,
+.lq-preview-body ul,
+.lq-preview-body ol,
+.lq-preview-body table,
+.lq-preview-body pre,
+.lq-preview-body blockquote {
+  margin: 0 0 0.9em;
+}
+
+.lq-preview-body .lq-link,
+.cm-lq-table .lq-link {
+  color: var(--vscode-textLink-foreground);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.lq-preview-body .lq-link:hover,
+.lq-preview-body .lq-link:focus-visible {
+  color: var(--vscode-textLink-activeForeground);
+  text-decoration: underline;
+}
+
+.lq-preview-body .lq-link:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+}
+
+.lq-preview-body code,
+.cm-lq-table code {
+  font-family: var(--vscode-editor-font-family);
+  font-size: 0.88em;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  background-color: var(--vscode-textCodeBlock-background);
+}
+
+.lq-preview-body pre {
+  padding: 10px 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  background-color: var(--vscode-textCodeBlock-background);
+  line-height: 1.5;
+}
+
+.lq-preview-body pre code {
+  padding: 0;
+  background: transparent;
+}
+
+.lq-preview-body .lq-raw-html {
+  color: var(--vscode-descriptionForeground);
+}
+
+.lq-preview-body blockquote {
+  padding: 0 16px;
+  border-left: 4px solid var(--lq-quote-bar);
+  background-color: var(--lq-quote-background);
+}
+
+.lq-preview-body hr {
+  border: none;
+  border-top: 1px solid var(--lq-rule);
+}
+
+.lq-preview-body table,
+.cm-lq-table table {
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+}
+
+.lq-preview-body th,
+.lq-preview-body td,
+.cm-lq-table th,
+.cm-lq-table td {
+  padding: 4px 12px;
+  border: 1px solid var(--lq-rule);
+}
+
+.lq-preview-body th,
+.cm-lq-table th {
+  background-color: var(--vscode-textCodeBlock-background);
+}
+
+.lq-preview-body img {
+  max-width: 100%;
+}
+
+.lq-preview-body .lq-image-missing {
+  color: var(--vscode-descriptionForeground);
+  font-style: italic;
+}
+
+.lq-preview-body .task-list-item {
+  list-style: none;
+}
+
+.lq-preview-body .task-list-item input {
+  margin: 0 0.5em 0 -1.4em;
+}
+
+.lq-preview-body .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.lq-preview-body .footnotes {
+  font-size: 0.9em;
+  border-top: 1px solid var(--vscode-widget-border, transparent);
+}
+
+/* Material for MkDocs admonitions and collapsible blocks, in the colors of the live preview. */
+.lq-preview-body .lq-admonition {
+  margin: 0 0 0.9em;
+  padding: 0 12px 4px 16px;
+  border-left: 4px solid var(--lq-adm);
+  border-radius: 0 4px 4px 0;
+  background-color: color-mix(in srgb, var(--lq-adm) 8%, transparent);
+}
+
+.lq-preview-body .lq-admonition-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 -12px 0.5em -16px;
+  padding: 4px 12px 4px 16px;
+  font-weight: 600;
+  color: var(--lq-adm);
+  background-color: color-mix(in srgb, var(--lq-adm) 16%, transparent);
+}
+
+.lq-preview-body summary.lq-admonition-title {
+  cursor: pointer;
+}
+
+.lq-preview-body details.lq-admonition:not([open]) {
+  padding-bottom: 0;
+}
+
+.lq-preview-body details.lq-admonition:not([open]) > .lq-admonition-title {
+  margin-bottom: 0;
+}
+
+/* Admonition family colors, shared by the rendered preview and the live preview of the editor. */
+.lq-adm-note,
+.cm-lq-adm-note {
+  --lq-adm: #448aff;
+}
+
+.lq-adm-abstract,
+.cm-lq-adm-abstract {
+  --lq-adm: #00b0ff;
+}
+
+.lq-adm-info,
+.cm-lq-adm-info {
+  --lq-adm: #00b8d4;
+}
+
+.lq-adm-tip,
+.cm-lq-adm-tip {
+  --lq-adm: #00bfa5;
+}
+
+.lq-adm-success,
+.cm-lq-adm-success {
+  --lq-adm: #00c853;
+}
+
+.lq-adm-question,
+.cm-lq-adm-question {
+  --lq-adm: #64dd17;
+}
+
+.lq-adm-warning,
+.cm-lq-adm-warning {
+  --lq-adm: #ff9100;
+}
+
+.lq-adm-failure,
+.cm-lq-adm-failure {
+  --lq-adm: #ff5252;
+}
+
+.lq-adm-danger,
+.cm-lq-adm-danger {
+  --lq-adm: #ff1744;
+}
+
+.lq-adm-bug,
+.cm-lq-adm-bug {
+  --lq-adm: #f50057;
+}
+
+.lq-adm-example,
+.cm-lq-adm-example {
+  --lq-adm: #7c4dff;
+}
+
+.lq-adm-quote,
+.cm-lq-adm-quote {
+  --lq-adm: #9e9e9e;
+}
+
+/* Content tabs: a bar of labels and the panel of the selected tab, as in Material for MkDocs. */
+.lq-preview-body .lq-tabs {
+  margin: 0 0 0.9em;
+  border: 1px solid var(--lq-rule);
+  border-radius: 4px;
+}
+
+.lq-preview-body .lq-tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--lq-rule);
+}
+
+.lq-preview-body .lq-tab-label {
+  padding: 6px 12px;
+  cursor: pointer;
+  color: var(--vscode-descriptionForeground);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.lq-preview-body .lq-tab-label:hover {
+  color: var(--vscode-foreground);
+}
+
+.lq-preview-body .lq-tab-label.lq-tab-active {
+  color: var(--vscode-foreground);
+  border-bottom-color: var(--vscode-textLink-foreground);
+}
+
+.lq-preview-body .lq-tab-label:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
+}
+
+.lq-preview-body .lq-tab {
+  display: none;
+  padding: 10px 12px 2px;
+}
+
+.lq-preview-body .lq-tab.lq-tab-active {
+  display: block;
+}
+
+/*
+ * Markdown syntax in the editor, from the `lq-md-*` classes of `main.ts`. These rules come before
+ * the code highlighting below, so that code tokens keep their colors inside fenced blocks.
+ */
+.cm-editor .lq-md-heading,
+.cm-editor .lq-md-strong {
+  font-weight: bold;
+}
+
+.cm-editor .lq-md-h1 {
+  font-size: 1.85em;
+}
+
+.cm-editor .lq-md-h2 {
+  font-size: 1.5em;
+}
+
+.cm-editor .lq-md-h3 {
+  font-size: 1.25em;
+}
+
+.cm-editor .lq-md-h4 {
+  font-size: 1.1em;
+}
+
+.cm-editor .lq-md-emphasis {
+  font-style: italic;
+}
+
+.cm-editor .lq-md-strikethrough {
+  text-decoration: line-through;
+}
+
+.cm-editor .lq-md-link {
+  color: var(--vscode-textLink-foreground);
+}
+
+.cm-editor .lq-md-code {
+  font-family: var(--vscode-editor-font-family);
+  color: var(--vscode-textPreformat-foreground);
+}
+
+.cm-editor .lq-md-meta {
+  color: var(--vscode-descriptionForeground);
+}
+
+.cm-editor .lq-md-quote {
+  color: var(--vscode-descriptionForeground);
+  font-style: italic;
+}
+
+/* While Ctrl (Cmd on macOS) is held, links look clickable; `main.ts` sets the class. */
+.cm-editor.cm-lq-follow .cm-lq-link {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* The front matter summary above the text, a button that opens the Properties view. */
+.cm-editor .cm-lq-front-matter {
+  font: inherit;
+  font-size: 0.85em;
+  margin: 0 24px 8px;
+  padding: 2px 8px;
+  color: var(--vscode-descriptionForeground);
+  background-color: transparent;
+  border: 1px solid var(--vscode-widget-border, var(--vscode-descriptionForeground));
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/*
+ * Reading layout of `Edit` (§8), modelled on the rendered preview: proportional font, a
+ * centered text column, and block styles. `Source` removes the `cm-lq-preview` class and keeps
+ * the plain source layout of the CodeMirror theme in `main.ts`. The selectors start with
+ * `.cm-editor.cm-lq-preview`, so they outweigh that theme.
+ */
+.cm-editor.cm-lq-preview .cm-scroller {
+  font-family: var(--vscode-font-family);
+  font-size: calc(var(--lorequill-font-size) * 1.1);
+  line-height: 1.75;
+}
+
+.cm-editor.cm-lq-preview .cm-content {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--lorequill-max-width, none);
+  margin: 0 auto;
+  padding: 24px 0 48px;
+}
+
+.cm-editor.cm-lq-preview .cm-line {
+  padding: 0 var(--lq-gutter);
+}
+
+.cm-editor.cm-lq-preview .cm-lq-table {
+  padding: 4px var(--lq-gutter) 8px;
+}
+
+.cm-editor.cm-lq-preview .cm-activeLine {
+  background-color: transparent;
+}
+
+.cm-editor.cm-lq-preview .cm-lq-blank {
+  line-height: 0.9;
+}
+
+.cm-editor.cm-lq-preview .cm-lq-heading {
+  line-height: 1.3;
+  padding-top: 0.5em;
+  padding-bottom: 0.2em;
+  font-weight: bold;
+}
+
+/* The rule under H1 and H2 spans the text column, not the line padding. */
+.cm-editor.cm-lq-preview .cm-lq-h1,
+.cm-editor.cm-lq-preview .cm-lq-h2 {
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0.3em;
+  margin-left: var(--lq-gutter);
+  margin-right: var(--lq-gutter);
+  border-bottom: 1px solid var(--lq-rule);
+}
+
+.cm-editor.cm-lq-preview .cm-lq-list {
+  padding-left: calc(var(--lq-gutter) + 1.2em);
+}
+
+.cm-editor.cm-lq-preview .cm-lq-bullet {
+  display: inline-block;
+  width: 1em;
+}
+
+.cm-editor.cm-lq-preview .cm-lq-quote {
+  border-left: 4px solid var(--lq-quote-bar);
+  background-color: var(--lq-quote-background);
+  padding-left: 16px;
+  margin-left: var(--lq-gutter);
+  margin-right: var(--lq-gutter);
+}
+
+.cm-editor.cm-lq-preview .cm-lq-quote * {
+  font-style: normal;
+}
+
+/* Material for MkDocs admonitions: the family color tints the box, its bar, and the title. */
+.cm-editor.cm-lq-preview .cm-lq-adm {
+  border-left: 4px solid var(--lq-adm);
+  background-color: color-mix(in srgb, var(--lq-adm) 8%, transparent);
+  padding-left: 16px;
+  padding-right: 12px;
+  margin-left: var(--lq-gutter);
+  margin-right: var(--lq-gutter);
+}
+
+.cm-editor.cm-lq-preview .cm-lq-adm-title {
+  background-color: color-mix(in srgb, var(--lq-adm) 16%, transparent);
+  font-weight: 600;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-top-right-radius: 4px;
+}
+
+.cm-editor.cm-lq-preview .cm-lq-adm-last {
+  padding-bottom: 8px;
+  border-bottom-right-radius: 4px;
+}
+
+.cm-editor.cm-lq-preview .cm-lq-adm-heading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--lq-adm);
+}
+
+.cm-editor.cm-lq-preview .cm-lq-adm-chevron {
+  margin-left: 4px;
+  opacity: 0.8;
+}
+
+.cm-editor.cm-lq-preview .cm-lq-task {
+  margin: 0 0.5em 0 0;
+  vertical-align: -0.1em;
+  cursor: pointer;
+  accent-color: var(--vscode-checkbox-background, var(--vscode-textLink-foreground));
+}
+
+.cm-editor.cm-lq-preview .cm-lq-code-block {
+  font-family: var(--vscode-editor-font-family);
+  font-size: 0.9em;
+  line-height: 1.5;
+  background-color: var(--vscode-textCodeBlock-background);
+  padding: 0 16px;
+  margin-left: var(--lq-gutter);
+  margin-right: var(--lq-gutter);
+}
+
+.cm-editor.cm-lq-preview .cm-lq-code-info {
+  font-family: var(--vscode-font-family);
+  font-size: 0.8em;
+  color: var(--vscode-descriptionForeground);
+}
+
+.cm-editor.cm-lq-preview .cm-lq-fence-end {
+  line-height: 0.5;
+}
+
+.cm-editor.cm-lq-preview .cm-lq-code-first {
+  padding-top: 10px;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+.cm-editor.cm-lq-preview .cm-lq-code-last {
+  padding-bottom: 10px;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.cm-editor.cm-lq-preview .cm-lq-inline-code {
+  font-family: var(--vscode-editor-font-family);
+  font-size: 0.88em;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  background-color: var(--vscode-textCodeBlock-background);
+}
+
+.cm-editor.cm-lq-preview .cm-lq-hr {
+  display: inline-block;
+  width: 100%;
+  vertical-align: middle;
+  border-top: 1px solid var(--lq-rule);
+}
+
+/*
+ * Syntax highlighting in fenced code blocks, shared by the editor and the rendered preview.
+ * The classes come from `code-languages.ts`; the colors are VS Code theme colors that follow the
+ * default token colors, so light, dark, and high-contrast themes work.
+ */
+.cm-editor .tok-keyword,
+.cm-editor .tok-atom,
+.lq-preview-body .tok-keyword,
+.lq-preview-body .tok-atom {
+  color: var(--vscode-debugTokenExpression-boolean, inherit);
+}
+
+.cm-editor .tok-string,
+.lq-preview-body .tok-string {
+  color: var(--vscode-debugTokenExpression-string, inherit);
+}
+
+.cm-editor .tok-string2,
+.cm-editor .tok-macro,
+.lq-preview-body .tok-string2,
+.lq-preview-body .tok-macro {
+  color: var(--vscode-debugTokenExpression-name, inherit);
+}
+
+.cm-editor .tok-number,
+.lq-preview-body .tok-number {
+  color: var(--vscode-debugTokenExpression-number, inherit);
+}
+
+.cm-editor .tok-comment,
+.lq-preview-body .tok-comment {
+  color: var(--vscode-descriptionForeground, inherit);
+  font-style: italic;
+}
+
+.cm-editor .tok-function,
+.lq-preview-body .tok-function {
+  color: var(--vscode-symbolIcon-functionForeground, inherit);
+}
+
+.cm-editor .tok-type,
+.lq-preview-body .tok-type {
+  color: var(--vscode-symbolIcon-classForeground, inherit);
+}
+
+.cm-editor .tok-property,
+.lq-preview-body .tok-property {
+  color: var(--vscode-symbolIcon-variableForeground, inherit);
+}
+
+.cm-editor .tok-meta,
+.lq-preview-body .tok-meta {
+  color: var(--vscode-descriptionForeground, inherit);
+}
+
+.cm-editor .tok-inserted,
+.lq-preview-body .tok-inserted {
+  color: var(--vscode-gitDecoration-addedResourceForeground, inherit);
+}
+
+.cm-editor .tok-deleted,
+.lq-preview-body .tok-deleted {
+  color: var(--vscode-gitDecoration-deletedResourceForeground, inherit);
+}
+
+.cm-editor .tok-invalid,
+.lq-preview-body .tok-invalid {
+  color: var(--vscode-errorForeground, inherit);
+}
+
+/* A table in `Edit`, shown as a grid until the cursor enters it. */
+.cm-lq-table {
+  cursor: text;
+  /* CodeMirror's pre-wrap would turn the line breaks of the rendered HTML into blank lines. */
+  white-space: normal;
+}
+
+/* As in the text, links in the grid open only with Ctrl or Cmd held. */
+.cm-lq-table .lq-link {
+  cursor: text;
+}
+
+.cm-lq-follow .cm-lq-table .lq-link {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Link completion, in the colors of VS Code's suggest widget. */
+.cm-tooltip.cm-tooltip-autocomplete {
+  color: var(--vscode-editorSuggestWidget-foreground);
+  background-color: var(--vscode-editorSuggestWidget-background);
+  border: 1px solid var(--vscode-editorSuggestWidget-border, var(--vscode-widget-border));
+  font-family: var(--vscode-editor-font-family);
+}
+
+.cm-tooltip.cm-tooltip-autocomplete > ul > li[aria-selected] {
+  color: var(--vscode-editorSuggestWidget-selectedForeground, inherit);
+  background-color: var(--vscode-editorSuggestWidget-selectedBackground);
+}
+
+.cm-tooltip-autocomplete .cm-completionDetail {
+  margin-left: 1em;
+  font-family: var(--vscode-font-family);
+  font-style: normal;
+  color: var(--vscode-descriptionForeground);
+}
+
+.cm-tooltip-autocomplete .cm-completionMatchedText {
+  color: var(--vscode-editorSuggestWidget-highlightForeground);
+  text-decoration: none;
+  font-weight: 600;
+}

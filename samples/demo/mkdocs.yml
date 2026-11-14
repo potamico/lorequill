@@ -1,0 +1,17 @@
+# Builds the demo with the stable links hook; see docs/examples/mkdocs/README.md.
+site_name: Lorequill Demo
+site_url: https://docs.example.org/
+hooks:
+  - ../../docs/examples/mkdocs/lorequill_stable_links.py
+# Drafts are checked by Lorequill and shown by `mkdocs serve`, but not published.
+draft_docs: |
+  drafts/
+# Excluded from the Lorequill profile as well: neither checked nor published.
+exclude_docs: |
+  archive/
+# Heading anchors as the profile's `slugify: unicode` expects, and `{#id}` on headings.
+markdown_extensions:
+  - attr_list
+  - toc:
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds: { case: lower }

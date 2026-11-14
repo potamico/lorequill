@@ -1,0 +1,27 @@
+{
+  "name": "@lorequill/checks",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Lorequill check engine and CLI: declarative repository checks shared by editor and CI",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "bin": {
+    "lorequill-checks": "dist/cli.cjs"
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@lorequill/markdown": "0.2.0",
+    "@lorequill/profile": "0.2.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

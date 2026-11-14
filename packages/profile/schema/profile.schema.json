@@ -1,0 +1,384 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Profile",
+  "description": "Lorequill repository profile, version 1 (.lorequill/config.yaml). The schema is closed: unknown keys and unknown rules are rejected.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "content"],
+  "properties": {
+    "version": {
+      "description": "Profile format version. Only version 1 is supported.",
+      "const": 1
+    },
+    "locale": {
+      "description": "Interface locale for this repository, for example de-CH.",
+      "type": "string",
+      "maxLength": 35,
+      "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$"
+    },
+    "content": { "$ref": "#/$defs/content" },
+    "review": { "$ref": "#/$defs/review" },
+    "checks": { "$ref": "#/$defs/checks" },
+    "site": { "$ref": "#/$defs/site" },
+    "collections": {
+      "type": "array",
+      "maxItems": 100,
+      "items": { "$ref": "#/$defs/collection" }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "description": "Stable identifier for check rules and collections.",
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$"
+    },
+    "fieldKey": {
+      "description": "Front matter key.",
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_-]{0,63}$"
+    },
+    "shortText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "globPattern": {
+      "description": "Glob relative to the content root. Absolute patterns and '..' segments are rejected.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000-\\u001f\\u007f]+$"
+    },
+    "relativeDirectory": {
+      "description": "Relative POSIX directory inside the repository: no absolute paths, no '..' segments, no drive letters, no backslashes. A single '.' selects the repository root.",
+      "type": "string",
+      "maxLength": 512,
+      "pattern": "^(?:\\.|(?!\\.\\.?(?:/|$))[^/\\\\:*?\"<>|\\u0000-\\u001f]+(?:/(?!\\.\\.?(?:/|$))[^/\\\\:*?\"<>|\\u0000-\\u001f]+)*)$"
+    },
+    "collectionFolder": {
+      "description": "Directory relative to the content root. The only supported placeholder is the whole segment {domain}.",
+      "type": "string",
+      "maxLength": 512,
+      "pattern": "^(?:\\{domain\\}|(?!\\.\\.?(?:/|$))[^/\\\\:*?\"<>|{}\\u0000-\\u001f]+)(?:/(?:\\{domain\\}|(?!\\.\\.?(?:/|$))[^/\\\\:*?\"<>|{}\\u0000-\\u001f]+))*$"
+    },
+    "branchName": {
+      "description": "Git branch name. Rejects names that Git forbids and names that could be mistaken for command-line options.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "^(?!-)(?!/)(?!@$)(?!.*\\.\\.)(?!.*//)(?!.*@\\{)(?!.*\\.lock(?:/|$))(?!.*(?:^|/)\\.)(?!.*[/.]$)[^\\s~^:?*\\[\\\\\\u0000-\\u001f\\u007f]+$"
+    },
+    "content": {
+      "title": "ContentSettings",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["root", "include"],
+      "properties": {
+        "root": { "$ref": "#/$defs/relativeDirectory" },
+        "include": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/globPattern" }
+        },
+        "exclude": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/globPattern" }
+        },
+        "drafts": {
+          "description": "Drafts: files that are checked like other pages but not published. relative-links reports links from published pages to them.",
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/globPattern" }
+        }
+      }
+    },
+    "review": {
+      "title": "ReviewSettings",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_branch"],
+      "properties": {
+        "base_branch": { "$ref": "#/$defs/branchName" }
+      }
+    },
+    "site": {
+      "title": "SiteSettings",
+      "description": "The published site built from the content, for stable links to pages.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "description": "Absolute http or https URL of the published site, ending with a slash.",
+          "type": "string",
+          "maxLength": 2048,
+          "pattern": "^https?://[^\\s/?#]+(?:/[^\\s?#]*)?/$"
+        },
+        "stable_links": { "$ref": "#/$defs/stableLinks" }
+      }
+    },
+    "stableLinks": {
+      "title": "StableLinks",
+      "description": "Addresses that stay the same when a page moves: the site build redirects each one to the page whose front matter field has that value.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "path"],
+      "properties": {
+        "field": { "$ref": "#/$defs/fieldKey" },
+        "path": {
+          "description": "Path below the site URL with exactly one {value} placeholder, for example id/{value}/. No leading slash and no '.' or '..' segments.",
+          "type": "string",
+          "maxLength": 200,
+          "pattern": "^(?!/)(?!(?:.*/)?\\.\\.?(?:/|$))[A-Za-z0-9._~/-]*\\{value\\}[A-Za-z0-9._~/-]*$"
+        }
+      }
+    },
+    "checks": {
+      "title": "ChecksSettings",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "engine_version": {
+          "description": "Check engine version that CI runs, as pinned in the workflow. The editor shows a notice when its own engine version differs.",
+          "type": "string",
+          "maxLength": 64,
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?$"
+        },
+        "timeout_seconds": {
+          "description": "Single run-level timeout for an entire check run. Defaults to 30 when omitted.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 300
+        },
+        "rules": {
+          "type": "array",
+          "maxItems": 100,
+          "items": { "$ref": "#/$defs/checkRule" }
+        }
+      }
+    },
+    "checkRule": {
+      "type": "object",
+      "discriminator": { "propertyName": "rule" },
+      "oneOf": [
+        { "$ref": "#/$defs/forbiddenTextRule" },
+        { "$ref": "#/$defs/uniqueFieldRule" },
+        { "$ref": "#/$defs/allowValuesRule" },
+        { "$ref": "#/$defs/relativeLinksRule" },
+        { "$ref": "#/$defs/fieldFormatRule" },
+        { "$ref": "#/$defs/referenceFieldRule" }
+      ]
+    },
+    "forbiddenTextRule": {
+      "title": "ForbiddenTextRule",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "rule", "text"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "rule": { "const": "forbidden-text" },
+        "text": {
+          "description": "Literal, non-empty substring. Never interpreted as a regular expression.",
+          "$ref": "#/$defs/shortText"
+        }
+      }
+    },
+    "uniqueFieldRule": {
+      "title": "UniqueFieldRule",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "rule", "field"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "rule": { "const": "unique-field" },
+        "field": { "$ref": "#/$defs/fieldKey" }
+      }
+    },
+    "allowValuesRule": {
+      "title": "AllowValuesRule",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "rule", "marker", "values"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "rule": { "const": "allow-values" },
+        "marker": { "$ref": "#/$defs/shortText" },
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 200,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/shortText" }
+        }
+      }
+    },
+    "relativeLinksRule": {
+      "title": "RelativeLinksRule",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "rule"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "rule": { "const": "relative-links" },
+        "anchors": { "type": "boolean" },
+        "slugify": { "enum": ["unicode", "ascii"] }
+      }
+    },
+    "fieldFormatRule": {
+      "title": "FieldFormatRule",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "rule", "field", "prefixes"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "rule": { "const": "field-format" },
+        "field": { "$ref": "#/$defs/fieldKey" },
+        "prefixes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Za-z]{1,20}$" }
+        },
+        "when": { "$ref": "#/$defs/whenFilter" }
+      }
+    },
+    "referenceFieldRule": {
+      "title": "ReferenceFieldRule",
+      "description": "The field refers to other pages: each value (a value or a list of values) must equal the target field of another included page, compared like unique-field. With required, the field must be present on the pages in scope.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "rule", "field", "target"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "rule": { "const": "reference-field" },
+        "field": { "$ref": "#/$defs/fieldKey" },
+        "target": { "$ref": "#/$defs/fieldKey" },
+        "required": { "type": "boolean" },
+        "when": { "$ref": "#/$defs/whenFilter" }
+      }
+    },
+    "whenFilter": {
+      "title": "WhenFilter",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "in"],
+      "properties": {
+        "field": { "$ref": "#/$defs/fieldKey" },
+        "in": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 200,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/shortText" }
+        }
+      }
+    },
+    "collection": {
+      "title": "Collection",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "folder"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "label": { "$ref": "#/$defs/shortText" },
+        "folder": { "$ref": "#/$defs/collectionFolder" },
+        "match": { "$ref": "#/$defs/collectionMatch" },
+        "template": { "type": "string", "maxLength": 20000 },
+        "fields": {
+          "type": "array",
+          "maxItems": 100,
+          "items": { "$ref": "#/$defs/collectionField" }
+        }
+      }
+    },
+    "collectionMatch": {
+      "title": "CollectionMatch",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "equals"],
+      "properties": {
+        "field": { "$ref": "#/$defs/fieldKey" },
+        "equals": { "$ref": "#/$defs/shortText" }
+      }
+    },
+    "collectionField": {
+      "type": "object",
+      "discriminator": { "propertyName": "widget" },
+      "oneOf": [
+        { "$ref": "#/$defs/textLikeField" },
+        { "$ref": "#/$defs/booleanField" },
+        { "$ref": "#/$defs/listField" },
+        { "$ref": "#/$defs/selectField" }
+      ]
+    },
+    "textLikeField": {
+      "title": "TextLikeField",
+      "description": "Widgets string, text, date, and hidden. A date default is stored as a quoted YYYY-MM-DD string.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "widget"],
+      "properties": {
+        "key": { "$ref": "#/$defs/fieldKey" },
+        "label": { "$ref": "#/$defs/shortText" },
+        "widget": { "enum": ["string", "text", "date", "hidden"] },
+        "required": { "type": "boolean" },
+        "default": { "type": "string", "maxLength": 10000 }
+      }
+    },
+    "booleanField": {
+      "title": "BooleanField",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "widget"],
+      "properties": {
+        "key": { "$ref": "#/$defs/fieldKey" },
+        "label": { "$ref": "#/$defs/shortText" },
+        "widget": { "const": "boolean" },
+        "required": { "type": "boolean" },
+        "default": { "type": "boolean" }
+      }
+    },
+    "listField": {
+      "title": "ListField",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "widget"],
+      "properties": {
+        "key": { "$ref": "#/$defs/fieldKey" },
+        "label": { "$ref": "#/$defs/shortText" },
+        "widget": { "const": "list" },
+        "required": { "type": "boolean" },
+        "default": {
+          "type": "array",
+          "maxItems": 200,
+          "items": { "$ref": "#/$defs/shortText" }
+        }
+      }
+    },
+    "selectField": {
+      "title": "SelectField",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "widget", "options"],
+      "properties": {
+        "key": { "$ref": "#/$defs/fieldKey" },
+        "label": { "$ref": "#/$defs/shortText" },
+        "widget": { "const": "select" },
+        "required": { "type": "boolean" },
+        "options": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 200,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/shortText" }
+        },
+        "default": { "$ref": "#/$defs/shortText" }
+      }
+    }
+  }
+}

@@ -1,0 +1,65 @@
+# Neutral profile that uses every section and every built-in rule once.
+version: 1
+locale: en-US
+
+content:
+  root: docs
+  include: ["**/*.md"]
+  exclude:
+    - "**/index.md"
+    - "drafts/**"
+  drafts: ["ideas/**"]
+
+review:
+  base_branch: main
+
+site:
+  url: https://docs.example.org/handbook/
+  stable_links: { field: slug, path: "id/{value}/" }
+
+checks:
+  timeout_seconds: 45
+  rules:
+    - { id: no-wikilinks, rule: forbidden-text, text: "[[" }
+    - { id: unique-slugs, rule: unique-field, field: slug }
+    - id: allowed-relations
+      rule: allow-values
+      marker: "rel:"
+      values: [related, supports, contradicts]
+    - id: links
+      rule: relative-links
+      anchors: true
+      slugify: unicode
+    - id: ticket-ids
+      rule: field-format
+      field: ticket
+      prefixes: [BUG, FEAT]
+      when: { field: kind, in: [bug, feature] }
+    - id: successors
+      rule: reference-field
+      field: replaced_by
+      target: slug
+      required: true
+      when: { field: status, in: [retired] }
+
+collections:
+  - id: note
+    label: Note
+    folder: "{domain}/notes"
+    match: { field: kind, equals: note }
+    template: |
+      # {title}
+
+      ## Summary
+    fields:
+      - { key: title, label: Title, widget: string, required: true }
+      - { key: kind, widget: hidden, default: note }
+      - { key: published, label: Published, widget: boolean, default: false }
+      - { key: created, label: Created, widget: date }
+      - { key: summary, label: Summary, widget: text }
+      - { key: aliases, label: Aliases, widget: list, default: [] }
+      - key: status
+        label: Status
+        widget: select
+        default: draft
+        options: [draft, review, final]

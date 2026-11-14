@@ -1,0 +1,16 @@
+# Allow-list: the VSIX contains only these files.
+**
+!dist/extension.js
+!dist/server.js
+!dist/THIRD_PARTY_NOTICES.txt
+!dist/profile.schema.json
+!dist/webview/*.js
+!dist/webview/*.css
+!dist/webview/*.ttf
+!resources/**
+!package.json
+!package.nls.json
+!package.nls.*.json
+!README.md
+!LICENSE
+!NOTICE

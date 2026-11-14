@@ -1,0 +1,483 @@
+{
+  "name": "vscode-lorequill",
+  "displayName": "Lorequill – Structured Knowledge Documentation",
+  "description": "Structured Knowledge Documentation for Visual Studio Code",
+  "version": "0.2.0",
+  "publisher": "potamico",
+  "private": true,
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/potamico/lorequill.git",
+    "directory": "packages/extension"
+  },
+  "homepage": "https://github.com/potamico/lorequill#readme",
+  "bugs": {
+    "url": "https://github.com/potamico/lorequill/issues"
+  },
+  "keywords": [
+    "markdown",
+    "documentation",
+    "docs-as-code",
+    "knowledge base",
+    "git"
+  ],
+  "categories": [
+    "Other"
+  ],
+  "engines": {
+    "node": ">=22",
+    "vscode": "^1.110.0"
+  },
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "workspaceContains:.lorequill/config.yaml"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "Lorequill only offers read-only explanatory UI in untrusted workspaces. Managed editing, checks, and Git actions require a trusted workspace."
+    },
+    "virtualWorkspaces": {
+      "supported": false,
+      "description": "Lorequill requires a local Git clone and does not support virtual workspaces."
+    }
+  },
+  "contributes": {
+    "yamlValidation": [
+      {
+        "fileMatch": "**/.lorequill/config.yaml",
+        "url": "./dist/profile.schema.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "lorequill.showVersion",
+        "title": "%lorequill.command.showVersion%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.checkPages",
+        "title": "%lorequill.command.checkPages%",
+        "category": "Lorequill",
+        "icon": "$(checklist)"
+      },
+      {
+        "command": "lorequill.refreshPages",
+        "title": "%lorequill.command.refreshPages%",
+        "category": "Lorequill",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "lorequill.filterPages",
+        "title": "%lorequill.command.filterPages%",
+        "category": "Lorequill",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "lorequill.clearPageFilter",
+        "title": "%lorequill.command.clearPageFilter%",
+        "category": "Lorequill",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "lorequill.openProfile",
+        "title": "%lorequill.command.openProfile%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.openInEditor",
+        "title": "%lorequill.command.openInEditor%",
+        "category": "Lorequill",
+        "icon": "$(book)"
+      },
+      {
+        "command": "lorequill.copyStableLink",
+        "title": "%lorequill.command.copyStableLink%",
+        "category": "Lorequill",
+        "icon": "$(link)"
+      },
+      {
+        "command": "lorequill.openAsText",
+        "title": "%lorequill.command.openAsText%",
+        "category": "Lorequill",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "lorequill.editor.find",
+        "title": "%lorequill.command.find%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.editor.replace",
+        "title": "%lorequill.command.replace%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.editor.undo",
+        "title": "%lorequill.command.undo%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.editor.redo",
+        "title": "%lorequill.command.redo%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.editor.viewEdit",
+        "title": "%lorequill.command.viewEdit%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.editor.viewBoth",
+        "title": "%lorequill.command.viewBoth%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.editor.viewPreview",
+        "title": "%lorequill.command.viewPreview%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.outline.reveal",
+        "title": "%lorequill.command.revealHeading%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.newPage",
+        "title": "%lorequill.command.newPage%",
+        "category": "Lorequill",
+        "icon": "$(new-file)"
+      },
+      {
+        "command": "lorequill.insertLink",
+        "title": "%lorequill.command.insertLink%",
+        "category": "Lorequill",
+        "icon": "$(link)"
+      },
+      {
+        "command": "lorequill.commit",
+        "title": "%lorequill.command.commit%",
+        "category": "Lorequill",
+        "icon": "$(git-commit)"
+      },
+      {
+        "command": "lorequill.verifyCommit",
+        "title": "%lorequill.command.verifyCommit%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.showCommitFindings",
+        "title": "%lorequill.command.showCommitFindings%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.submit",
+        "title": "%lorequill.command.submit%",
+        "category": "Lorequill",
+        "icon": "$(git-pull-request-create)"
+      },
+      {
+        "command": "lorequill.openReview",
+        "title": "%lorequill.command.openReview%",
+        "category": "Lorequill"
+      }
+    ],
+    "configuration": {
+      "title": "%lorequill.configuration.title%",
+      "properties": {
+        "lorequill.editor.maxTextWidth": {
+          "type": "number",
+          "default": 800,
+          "minimum": 0,
+          "maximum": 10000,
+          "markdownDescription": "%lorequill.configuration.maxTextWidth%",
+          "scope": "resource"
+        },
+        "lorequill.links.updateOnMove": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "%lorequill.configuration.updateLinksOnMove%",
+          "scope": "resource"
+        }
+      }
+    },
+    "customEditors": [
+      {
+        "viewType": "lorequill.pageEditor",
+        "displayName": "%lorequill.editor.displayName%",
+        "selector": [
+          {
+            "filenamePattern": "*.md"
+          }
+        ],
+        "priority": "option"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "lorequill",
+          "title": "%lorequill.viewContainer.title%",
+          "icon": "resources/lorequill.svg"
+        }
+      ]
+    },
+    "views": {
+      "lorequill": [
+        {
+          "id": "lorequill.pages",
+          "name": "%lorequill.view.pages%",
+          "when": "lorequill.enabled"
+        },
+        {
+          "id": "lorequill.outline",
+          "name": "%lorequill.view.outline%",
+          "when": "lorequill.enabled"
+        },
+        {
+          "type": "webview",
+          "id": "lorequill.properties",
+          "name": "%lorequill.view.properties%",
+          "when": "lorequill.enabled"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "lorequill.pages",
+        "contents": "%lorequill.viewsWelcome.untrusted%",
+        "when": "!isWorkspaceTrusted"
+      },
+      {
+        "view": "lorequill.outline",
+        "contents": "%lorequill.viewsWelcome.untrusted%",
+        "when": "!isWorkspaceTrusted"
+      },
+      {
+        "view": "lorequill.outline",
+        "contents": "%lorequill.viewsWelcome.outlineNoPage%",
+        "when": "isWorkspaceTrusted && lorequill.outlineState != 'empty'"
+      },
+      {
+        "view": "lorequill.outline",
+        "contents": "%lorequill.viewsWelcome.outlineNoHeadings%",
+        "when": "isWorkspaceTrusted && lorequill.outlineState == 'empty'"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "lorequill.newPage",
+          "when": "view == lorequill.pages && isWorkspaceTrusted",
+          "group": "navigation@-1"
+        },
+        {
+          "command": "lorequill.checkPages",
+          "when": "view == lorequill.pages && isWorkspaceTrusted",
+          "group": "navigation@0"
+        },
+        {
+          "command": "lorequill.filterPages",
+          "when": "view == lorequill.pages",
+          "group": "navigation@1"
+        },
+        {
+          "command": "lorequill.clearPageFilter",
+          "when": "view == lorequill.pages && lorequill.pagesFiltered",
+          "group": "navigation@2"
+        },
+        {
+          "command": "lorequill.refreshPages",
+          "when": "view == lorequill.pages",
+          "group": "navigation@3"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "lorequill.checkPages",
+          "when": "lorequill.enabled && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.refreshPages",
+          "when": "lorequill.enabled && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.filterPages",
+          "when": "lorequill.enabled && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.clearPageFilter",
+          "when": "lorequill.enabled && lorequill.pagesFiltered"
+        },
+        {
+          "command": "lorequill.openProfile",
+          "when": "lorequill.enabled && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.openInEditor",
+          "when": "resourcePath in lorequill.pagePaths && activeCustomEditorId != 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.openAsText",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.copyStableLink",
+          "when": "(activeCustomEditorId == 'lorequill.pageEditor' || resourcePath in lorequill.pagePaths) && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.find",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.replace",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.undo",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.redo",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.viewEdit",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.viewBoth",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.viewPreview",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.outline.reveal",
+          "when": "false"
+        },
+        {
+          "command": "lorequill.newPage",
+          "when": "lorequill.enabled && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.insertLink",
+          "when": "isWorkspaceTrusted && (activeCustomEditorId == 'lorequill.pageEditor' || resourcePath in lorequill.pagePaths)"
+        },
+        {
+          "command": "lorequill.commit",
+          "when": "lorequill.enabled && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.verifyCommit",
+          "when": "lorequill.enabled && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.showCommitFindings",
+          "when": "lorequill.enabled && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.submit",
+          "when": "lorequill.enabled && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.openReview",
+          "when": "false"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "lorequill.openInEditor",
+          "when": "resourcePath in lorequill.pagePaths && activeCustomEditorId != 'lorequill.pageEditor' && isWorkspaceTrusted",
+          "group": "navigation@1"
+        },
+        {
+          "command": "lorequill.openAsText",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted",
+          "group": "navigation@1"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "lorequill.copyStableLink",
+          "when": "view == lorequill.pages && viewItem == page && isWorkspaceTrusted",
+          "group": "lorequill@1"
+        },
+        {
+          "command": "lorequill.newPage",
+          "when": "view == lorequill.pages && (viewItem == directory || viewItem == folder) && isWorkspaceTrusted",
+          "group": "inline"
+        }
+      ],
+      "scm/title": [
+        {
+          "command": "lorequill.commit",
+          "when": "scmProvider == git && lorequill.enabled && isWorkspaceTrusted",
+          "group": "navigation@-10"
+        },
+        {
+          "command": "lorequill.submit",
+          "when": "scmProvider == git && lorequill.enabled && isWorkspaceTrusted",
+          "group": "navigation@-9"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "lorequill.editor.find",
+        "key": "ctrl+f",
+        "mac": "cmd+f",
+        "when": "activeCustomEditorId == 'lorequill.pageEditor' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus"
+      },
+      {
+        "command": "lorequill.editor.replace",
+        "key": "ctrl+h",
+        "mac": "cmd+alt+f",
+        "when": "activeCustomEditorId == 'lorequill.pageEditor' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus"
+      },
+      {
+        "command": "lorequill.editor.undo",
+        "key": "ctrl+z",
+        "mac": "cmd+z",
+        "when": "activeCustomEditorId == 'lorequill.pageEditor' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus"
+      },
+      {
+        "command": "lorequill.editor.redo",
+        "key": "ctrl+y",
+        "mac": "cmd+shift+z",
+        "when": "activeCustomEditorId == 'lorequill.pageEditor' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus"
+      },
+      {
+        "command": "lorequill.editor.redo",
+        "key": "ctrl+shift+z",
+        "when": "activeCustomEditorId == 'lorequill.pageEditor' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus && !isMac"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "build:watch": "node esbuild.mjs --watch",
+    "build:test": "tsc -p tsconfig.test.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "test:integration": "npm run build && npm run build:test && node out/test/integration/runTest.js",
+    "package": "node scripts/package.mjs"
+  },
+  "devDependencies": {
+    "@types/mocha": "10.0.10",
+    "@types/vscode": "1.110.0",
+    "@vscode/test-electron": "3.1.0",
+    "@vscode/vsce": "4.1.0",
+    "esbuild": "0.28.2",
+    "mocha": "12.0.3"
+  },
+  "dependencies": {
+    "@lorequill/checks": "0.2.0",
+    "@lorequill/editor": "0.2.0",
+    "@lorequill/markdown": "0.2.0",
+    "@lorequill/profile": "0.2.0",
+    "@lorequill/server": "0.2.0",
+    "vscode-languageclient": "11.0.0"
+  }
+}
