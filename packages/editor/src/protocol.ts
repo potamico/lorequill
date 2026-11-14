@@ -55,6 +55,17 @@ export const EDITOR_LABEL_KEYS = [
   "frontMatter",
   "tableHeader1",
   "tableHeader2",
+  "tableTools",
+  "tableInsertRowAbove",
+  "tableInsertRowBelow",
+  "tableInsertColumnLeft",
+  "tableInsertColumnRight",
+  "tableDeleteRow",
+  "tableDeleteColumn",
+  "tableAlignLeft",
+  "tableAlignCenter",
+  "tableAlignRight",
+  "tableFormat",
   "viewModes",
   "viewEdit",
   "viewBoth",
@@ -74,8 +85,21 @@ export interface EditorDiagnostic {
 }
 
 /** Commands the host forwards from VS Code to the active editor. */
+export const TABLE_COMMANDS = [
+  "tableInsertRowAbove",
+  "tableInsertRowBelow",
+  "tableInsertColumnLeft",
+  "tableInsertColumnRight",
+  "tableDeleteRow",
+  "tableDeleteColumn",
+  "tableAlignLeft",
+  "tableAlignCenter",
+  "tableAlignRight",
+  "tableFormat",
+] as const;
+export type TableCommand = (typeof TABLE_COMMANDS)[number];
 export type EditorCommand =
-  "find" | "replace" | "viewEdit" | "viewBoth" | "viewPreview" | "insertLink";
+  "find" | "replace" | "viewEdit" | "viewBoth" | "viewPreview" | "insertLink" | TableCommand;
 const EDITOR_COMMANDS: readonly string[] = [
   "insertLink",
   "find",
@@ -83,6 +107,7 @@ const EDITOR_COMMANDS: readonly string[] = [
   "viewEdit",
   "viewBoth",
   "viewPreview",
+  ...TABLE_COMMANDS,
 ];
 
 /** Where the page lives, for the rendered preview (§8). */

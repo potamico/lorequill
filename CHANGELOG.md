@@ -11,6 +11,9 @@ the check engine, the CLI, and the GitHub Action. The format follows
 
 - Documentation site at <https://lorequill.potamico.org/>, built from `docs/`, with getting started
   and references for the profile, the checks, and the CI Action.
+- Table editing in the page editor: Tab, Shift+Tab, and Enter move between cells and add rows, and
+  the table stays aligned. The table button and the command palette offer table tools to insert
+  and delete rows and columns, set a column's alignment, and align the table.
 - Extension icon for the Marketplace, Open VSX, and the Extensions view.
 
 ### Changed

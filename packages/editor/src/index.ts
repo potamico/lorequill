@@ -4,6 +4,7 @@ export {
   LIMITS,
   parseHostMessage,
   parseWebviewMessage,
+  TABLE_COMMANDS,
   type EditorCommand,
   type EditorDiagnostic,
   type EditorLabelKey,
@@ -13,6 +14,7 @@ export {
   type HostMessage,
   type PageLocation,
   type Position,
+  type TableCommand,
   type TextChange,
   type WebviewMessage,
 } from "./protocol";
@@ -37,6 +39,19 @@ export {
   type BlockFormat,
   type InlineFormat,
 } from "./formatting";
+export {
+  alignColumn,
+  deleteColumn,
+  deleteRow,
+  formatTable,
+  inTable,
+  insertColumn,
+  insertRow,
+  nextCell,
+  previousCell,
+  tableEnter,
+  type ColumnAlignment,
+} from "./table-edit";
 export { admonitionSyntax, readAdmonitionHeader, type AdmonitionHeader } from "./admonition-syntax";
 export { singleTildeStrikethrough } from "./strikethrough-syntax";
 export { linkTargetAt } from "./link-at";

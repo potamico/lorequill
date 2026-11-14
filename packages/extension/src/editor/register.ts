@@ -20,6 +20,16 @@ const WEBVIEW_COMMANDS = {
   "lorequill.editor.viewEdit": "viewEdit",
   "lorequill.editor.viewBoth": "viewBoth",
   "lorequill.editor.viewPreview": "viewPreview",
+  "lorequill.editor.tableInsertRowAbove": "tableInsertRowAbove",
+  "lorequill.editor.tableInsertRowBelow": "tableInsertRowBelow",
+  "lorequill.editor.tableDeleteRow": "tableDeleteRow",
+  "lorequill.editor.tableInsertColumnLeft": "tableInsertColumnLeft",
+  "lorequill.editor.tableInsertColumnRight": "tableInsertColumnRight",
+  "lorequill.editor.tableDeleteColumn": "tableDeleteColumn",
+  "lorequill.editor.tableAlignLeft": "tableAlignLeft",
+  "lorequill.editor.tableAlignCenter": "tableAlignCenter",
+  "lorequill.editor.tableAlignRight": "tableAlignRight",
+  "lorequill.editor.tableFormat": "tableFormat",
 } as const;
 
 /**

@@ -141,6 +141,56 @@
         "category": "Lorequill"
       },
       {
+        "command": "lorequill.editor.tableInsertRowAbove",
+        "title": "%lorequill.command.tableInsertRowAbove%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.editor.tableInsertRowBelow",
+        "title": "%lorequill.command.tableInsertRowBelow%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.editor.tableDeleteRow",
+        "title": "%lorequill.command.tableDeleteRow%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.editor.tableInsertColumnLeft",
+        "title": "%lorequill.command.tableInsertColumnLeft%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.editor.tableInsertColumnRight",
+        "title": "%lorequill.command.tableInsertColumnRight%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.editor.tableDeleteColumn",
+        "title": "%lorequill.command.tableDeleteColumn%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.editor.tableAlignLeft",
+        "title": "%lorequill.command.tableAlignLeft%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.editor.tableAlignCenter",
+        "title": "%lorequill.command.tableAlignCenter%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.editor.tableAlignRight",
+        "title": "%lorequill.command.tableAlignRight%",
+        "category": "Lorequill"
+      },
+      {
+        "command": "lorequill.editor.tableFormat",
+        "title": "%lorequill.command.tableFormat%",
+        "category": "Lorequill"
+      },
+      {
         "command": "lorequill.outline.reveal",
         "title": "%lorequill.command.revealHeading%",
         "category": "Lorequill"
@@ -354,6 +404,46 @@
         },
         {
           "command": "lorequill.editor.viewPreview",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableInsertRowAbove",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableInsertRowBelow",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableDeleteRow",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableInsertColumnLeft",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableInsertColumnRight",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableDeleteColumn",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableAlignLeft",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableAlignCenter",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableAlignRight",
+          "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
+        },
+        {
+          "command": "lorequill.editor.tableFormat",
           "when": "activeCustomEditorId == 'lorequill.pageEditor' && isWorkspaceTrusted"
         },
         {

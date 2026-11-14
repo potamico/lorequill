@@ -10,6 +10,7 @@ import {
   Compartment,
   EditorState,
   type Extension,
+  Prec,
   type TransactionSpec,
 } from "@codemirror/state";
 import { drawSelection, EditorView, highlightActiveLine, keymap } from "@codemirror/view";
@@ -23,13 +24,27 @@ import {
   toggleInline,
 } from "../formatting";
 import {
+  alignColumn,
+  deleteColumn,
+  deleteRow,
+  formatTable,
+  inTable,
+  insertColumn,
+  insertRow,
+  nextCell,
+  previousCell,
+  tableEnter,
+} from "../table-edit";
+import {
   LIMITS,
   parseHostMessage,
+  TABLE_COMMANDS,
   type EditorDiagnostic,
   type EditorLabelKey,
   type EditorLabels,
   type EditorSettings,
   type HostAction,
+  type TableCommand,
   type WebviewMessage,
 } from "../protocol";
 import { offsetOf, SyncClient, type ViewInstruction } from "../sync-client";
@@ -234,6 +249,14 @@ const view = new EditorView({
         extensions: [admonitionSyntax, singleTildeStrikethrough],
         codeLanguages: codeLanguages(),
       }),
+      // In a table, Tab and Shift+Tab move between cells and Enter adds a row (§8). Outside a
+      // table these commands decline, so Tab indents lists and Enter continues them.
+      Prec.high(
+        keymap.of([
+          { key: "Tab", run: tableKey(nextCell), shift: tableKey(previousCell) },
+          { key: "Enter", run: tableKey(tableEnter) },
+        ]),
+      ),
       keymap.of([
         ...searchKeymap,
         { key: "Tab", run: indentMore, shift: indentLess },
@@ -269,6 +292,7 @@ const view = new EditorView({
             const head = view.state.selection.main.head;
             const line = view.state.doc.lineAt(head);
             post({ type: "selection", line: line.number - 1, character: head - line.from });
+            updateTableButton();
           }, 100);
         }
         if (update.focusChanged && !update.view.hasFocus) {
@@ -650,6 +674,155 @@ function request(action: HostAction): void {
   post({ type: "request", action });
 }
 
+/** A key binding for a table command: handled in a table, passed on outside one. */
+function tableKey(command: (state: EditorState) => TransactionSpec | undefined) {
+  return (target: EditorView): boolean => {
+    const spec = command(target.state);
+    if (!spec) {
+      return false;
+    }
+    target.dispatch(spec);
+    return true;
+  };
+}
+
+function isTableCommand(command: string): command is TableCommand {
+  return (TABLE_COMMANDS as readonly string[]).includes(command);
+}
+
+const TABLE_ACTIONS: Readonly<
+  Record<TableCommand, (state: EditorState) => TransactionSpec | undefined>
+> = {
+  tableInsertRowAbove: (state) => insertRow(state, "above"),
+  tableInsertRowBelow: (state) => insertRow(state, "below"),
+  tableDeleteRow: deleteRow,
+  tableInsertColumnLeft: (state) => insertColumn(state, "left"),
+  tableInsertColumnRight: (state) => insertColumn(state, "right"),
+  tableDeleteColumn: deleteColumn,
+  tableAlignLeft: (state) => alignColumn(state, "left"),
+  tableAlignCenter: (state) => alignColumn(state, "center"),
+  tableAlignRight: (state) => alignColumn(state, "right"),
+  tableFormat: formatTable,
+};
+
+/** The table tools, in the order and groups of the menu. */
+const TABLE_MENU: readonly (readonly TableCommand[])[] = [
+  ["tableInsertRowAbove", "tableInsertRowBelow", "tableDeleteRow"],
+  ["tableInsertColumnLeft", "tableInsertColumnRight", "tableDeleteColumn"],
+  ["tableAlignLeft", "tableAlignCenter", "tableAlignRight"],
+  ["tableFormat"],
+];
+
+function runTableCommand(command: TableCommand): void {
+  // The table tools edit the source, so `Preview` switches to editing first.
+  if (effectiveMode() === "view") {
+    setViewMode("edit");
+  }
+  format(TABLE_ACTIONS[command]);
+}
+
+let tableButton: HTMLButtonElement | undefined;
+let tableMenu: HTMLElement | undefined;
+
+/** The table button announces its menu while the cursor is in a table. */
+function updateTableButton(): void {
+  if (!tableButton || !labels) {
+    return;
+  }
+  const active = inTable(view.state);
+  const label = active ? labels.tableTools : labels.table;
+  tableButton.title = label;
+  tableButton.setAttribute("aria-label", label);
+  tableButton.setAttribute("aria-haspopup", active ? "menu" : "false");
+}
+
+function closeTableMenu(): void {
+  tableMenu?.remove();
+  tableMenu = undefined;
+  tableButton?.setAttribute("aria-expanded", "false");
+  document.removeEventListener("mousedown", closeOnOutsideClick, true);
+}
+
+function closeOnOutsideClick(event: MouseEvent): void {
+  const target = event.target instanceof Node ? event.target : null;
+  // A click on the table button toggles the menu itself.
+  if (!tableMenu?.contains(target) && !tableButton?.contains(target)) {
+    closeTableMenu();
+  }
+}
+
+/** A menu of the table tools below the table button; unavailable tools are disabled. */
+function openTableMenu(anchor: HTMLElement, texts: EditorLabels): void {
+  closeTableMenu();
+  const menu = document.createElement("div");
+  menu.className = "lq-menu";
+  menu.setAttribute("role", "menu");
+  menu.setAttribute("aria-label", texts.tableTools);
+  const items: HTMLButtonElement[] = [];
+  TABLE_MENU.forEach((group, index) => {
+    if (index > 0) {
+      const separator = document.createElement("div");
+      separator.className = "lq-menu-separator";
+      separator.setAttribute("role", "separator");
+      menu.append(separator);
+    }
+    for (const command of group) {
+      const item = document.createElement("button");
+      item.type = "button";
+      item.className = "lq-menu-item";
+      item.setAttribute("role", "menuitem");
+      item.tabIndex = -1;
+      item.textContent = texts[command];
+      item.disabled = TABLE_ACTIONS[command](view.state) === undefined;
+      item.addEventListener("mousedown", (event) => {
+        event.preventDefault();
+      });
+      item.addEventListener("click", () => {
+        closeTableMenu();
+        runTableCommand(command);
+      });
+      menu.append(item);
+      if (!item.disabled) {
+        items.push(item);
+      }
+    }
+  });
+  menu.addEventListener("keydown", (event) => {
+    const current = items.indexOf(document.activeElement as HTMLButtonElement);
+    const move = (index: number): void => {
+      items[(index + items.length) % items.length]?.focus();
+    };
+    if (event.key === "ArrowDown") {
+      move(current + 1);
+    } else if (event.key === "ArrowUp") {
+      move(current - 1);
+    } else if (event.key === "Home") {
+      move(0);
+    } else if (event.key === "End") {
+      move(items.length - 1);
+    } else if (event.key === "Escape" || event.key === "Tab") {
+      closeTableMenu();
+      view.focus();
+    } else {
+      return;
+    }
+    event.preventDefault();
+  });
+  const rect = anchor.getBoundingClientRect();
+  menu.style.left = `${String(Math.round(rect.left))}px`;
+  menu.style.top = `${String(Math.round(rect.bottom + 2))}px`;
+  document.body.append(menu);
+  // Keep the menu inside the window when the button is near its right edge.
+  const overflow = rect.left + menu.offsetWidth - (window.innerWidth - 4);
+  if (overflow > 0) {
+    menu.style.left = `${String(Math.max(4, Math.round(rect.left - overflow)))}px`;
+  }
+  tableMenu = menu;
+  anchor.setAttribute("aria-expanded", "true");
+  document.addEventListener("mousedown", closeOnOutsideClick, true);
+  items[0]?.focus();
+}
+
 interface ButtonSpec {
   readonly label: EditorLabelKey;
   readonly icon?: string;
@@ -749,8 +922,16 @@ function buildToolbar(texts: EditorLabels): void {
       {
         label: "table",
         icon: "table",
+        // In a table, the button opens the table tools; elsewhere it inserts a table.
         run: () => {
-          format((state) => insertTable(state, [texts.tableHeader1, texts.tableHeader2]));
+          if (tableMenu) {
+            closeTableMenu();
+            view.focus();
+          } else if (tableButton && inTable(view.state)) {
+            openTableMenu(tableButton, texts);
+          } else {
+            format((state) => insertTable(state, [texts.tableHeader1, texts.tableHeader2]));
+          }
         },
       },
       {
@@ -768,6 +949,9 @@ function buildToolbar(texts: EditorLabels): void {
     element.setAttribute("role", "group");
     group.forEach((spec) => {
       const button = makeButton(spec, texts);
+      if (spec.label === "table") {
+        tableButton = button;
+      }
       // Undo and redo stay available; the formatting groups need the visible editor.
       if (index > 0) {
         editingButtons.push(button);
@@ -946,7 +1130,9 @@ window.addEventListener("message", (event: MessageEvent) => {
       completions.answer(message.id, message.items);
       break;
     case "command":
-      if (message.command === "insertLink") {
+      if (isTableCommand(message.command)) {
+        runTableCommand(message.command);
+      } else if (message.command === "insertLink") {
         requestInsertLink();
       } else if (message.command === "viewEdit") {
         setViewMode("edit");

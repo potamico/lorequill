@@ -781,3 +781,53 @@ body[data-mode="view"] #editor {
   text-decoration: none;
   font-weight: 600;
 }
+
+/* Table tools menu below the table button (§8). */
+.lq-menu {
+  position: fixed;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  padding: 4px;
+  border: 1px solid var(--vscode-menu-border, var(--vscode-widget-border, transparent));
+  border-radius: 4px;
+  background-color: var(--vscode-menu-background, var(--vscode-editorWidget-background));
+  color: var(--vscode-menu-foreground, var(--vscode-foreground));
+  box-shadow: 0 2px 8px var(--vscode-widget-shadow, rgba(0, 0, 0, 0.36));
+}
+
+.lq-menu-item {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 3px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lq-menu-item:hover:not(:disabled),
+.lq-menu-item:focus-visible {
+  outline: none;
+  background-color: var(
+    --vscode-menu-selectionBackground,
+    var(--vscode-list-activeSelectionBackground)
+  );
+  color: var(--vscode-menu-selectionForeground, var(--vscode-list-activeSelectionForeground));
+}
+
+.lq-menu-item:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.lq-menu-separator {
+  height: 1px;
+  margin: 4px 0;
+  background-color: var(
+    --vscode-menu-separatorBackground,
+    var(--vscode-widget-border, transparent)
+  );
+}
