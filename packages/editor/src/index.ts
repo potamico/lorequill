@@ -38,6 +38,7 @@ export {
   type InlineFormat,
 } from "./formatting";
 export { admonitionSyntax, readAdmonitionHeader, type AdmonitionHeader } from "./admonition-syntax";
+export { singleTildeStrikethrough } from "./strikethrough-syntax";
 export { linkTargetAt } from "./link-at";
 export { renderPreview, type PreviewContext } from "./render";
 export { buildAnchors, lineForTop, topForLine, type LineAnchor } from "./scroll-sync";

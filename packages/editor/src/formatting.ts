@@ -56,6 +56,20 @@ function runContains(format: InlineFormat, run: number): boolean {
   }
 }
 
+/**
+ * How many marker characters to remove when runs of `before` and `after` characters enclose the
+ * text, or `undefined` if they are not the format's markers. Strikethrough has one or two tildes
+ * on both sides (GFM); the others have their marker exactly.
+ */
+function enclosingMarker(format: InlineFormat, before: number, after: number): number | undefined {
+  if (format === "strikethrough") {
+    return before === after && (before === 1 || before === 2) ? before : undefined;
+  }
+  return runContains(format, before) && runContains(format, after)
+    ? INLINE_MARKERS[format].length
+    : undefined;
+}
+
 export function toggleInline(
   state: EditorState,
   format: InlineFormat,
@@ -79,29 +93,30 @@ export function toggleInline(
     // Markers outside the selection: **|text|**
     const outsideBefore = runBefore(text, from, character);
     const outsideAfter = runAfter(text, to, character);
-    if (runContains(format, outsideBefore) && runContains(format, outsideAfter)) {
+    const outside = enclosingMarker(format, outsideBefore, outsideAfter);
+    if (outside !== undefined) {
       changes.push(
-        { from: range.from - marker.length, to: range.from },
-        { from: range.to, to: range.to + marker.length },
+        { from: range.from - outside, to: range.from },
+        { from: range.to, to: range.to + outside },
       );
-      ranges.push(EditorSelection.range(range.from - marker.length, range.to - marker.length));
+      ranges.push(EditorSelection.range(range.from - outside, range.to - outside));
       continue;
     }
     // Markers inside the selection: |**text**|
     const insideBefore = runAfter(selected, 0, character);
     const insideAfter = runBefore(selected, selected.length, character);
+    const inside = enclosingMarker(format, insideBefore, insideAfter);
     if (
-      selected.length >= marker.length * 2 &&
-      runContains(format, insideBefore) &&
-      runContains(format, insideAfter) &&
+      inside !== undefined &&
+      selected.length >= inside * 2 &&
       outsideBefore === 0 &&
       outsideAfter === 0
     ) {
       changes.push(
-        { from: range.from, to: range.from + marker.length },
-        { from: range.to - marker.length, to: range.to },
+        { from: range.from, to: range.from + inside },
+        { from: range.to - inside, to: range.to },
       );
-      ranges.push(EditorSelection.range(range.from, range.to - marker.length * 2));
+      ranges.push(EditorSelection.range(range.from, range.to - inside * 2));
       continue;
     }
     if (outsideBefore > 0 || outsideAfter > 0 || insideBefore > 0 || insideAfter > 0) {

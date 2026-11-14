@@ -34,6 +34,7 @@ import {
 } from "../protocol";
 import { offsetOf, SyncClient, type ViewInstruction } from "../sync-client";
 import { admonitionSyntax } from "../admonition-syntax";
+import { singleTildeStrikethrough } from "../strikethrough-syntax";
 import { codeHighlighter, codeLanguages } from "../code-languages";
 import { linkTargetAt } from "../link-at";
 import type { PreviewContext } from "../render";
@@ -226,10 +227,11 @@ const view = new EditorView({
       // No CodeMirror history: undo and redo belong to the VS Code document (§7). The Markdown
       // keymap continues lists and quotes on Enter and ends them on an empty item (§8).
       // Fenced code blocks are parsed with the language named in their info string (§8).
+      // Strikethrough takes one or two tildes, as in GFM and the preview.
       markdown({
         base: markdownLanguage,
         addKeymap: true,
-        extensions: [admonitionSyntax],
+        extensions: [admonitionSyntax, singleTildeStrikethrough],
         codeLanguages: codeLanguages(),
       }),
       keymap.of([
