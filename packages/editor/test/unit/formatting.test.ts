@@ -59,6 +59,16 @@ describe("inline formatting", () => {
     expect(run("[[x]]", inline("code"))).toBe("`[[x]]`");
   });
 
+  it("removes strikethrough with one or two tildes and adds it with two", () => {
+    expect(run("a ~~[[word]]~~ b", inline("strikethrough"))).toBe("a [[word]] b");
+    expect(run("a ~[[word]]~ b", inline("strikethrough"))).toBe("a [[word]] b");
+    expect(run("a [[~word~]] b", inline("strikethrough"))).toBe("a [[word]] b");
+    expect(run("a [[~~word~~]] b", inline("strikethrough"))).toBe("a [[word]] b");
+    // Unequal or longer runs are ambiguous and stay as they are.
+    expect(run("a ~[[word]]~~ b", inline("strikethrough"))).toBeUndefined();
+    expect(run("a ~~~[[word]]~~~ b", inline("strikethrough"))).toBeUndefined();
+  });
+
   it("inserts empty markers at a cursor and removes them again", () => {
     expect(run("a | b", inline("italic"))).toBe("a *|* b");
     expect(run("a *|* b", inline("italic"))).toBe("a | b");

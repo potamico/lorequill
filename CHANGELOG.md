@@ -12,6 +12,11 @@ the check engine, the CLI, and the GitHub Action. The format follows
 - Documentation site at <https://lorequill.potamico.org/>, built from `docs/`, with getting started
   and references for the profile, the checks, and the CI Action.
 
+### Fixed
+
+- The page editor shows text between single tildes (`~text~`) as struck through, as GFM and the
+  preview do; before, only double tildes were. The strikethrough button removes both forms.
+
 ## [0.2.0] - 2026-11-14
 
 First release. The extension is "Lorequill – Structured Knowledge Documentation", with the
