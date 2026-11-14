@@ -20,6 +20,9 @@ the check engine, the CLI, and the GitHub Action. The format follows
 
 ### Fixed
 
+- A profile saved while Lorequill was reading it, for example by an editor that empties the file
+  before writing it, could leave the folder showing "The profile is empty" until the next change.
+  The profile is now read again when it changed during reading.
 - The page editor shows text between single tildes (`~text~`) as struck through, as GFM and the
   preview do; before, only double tildes were. The strikethrough button removes both forms.
 
