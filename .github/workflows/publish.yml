@@ -1,10 +1,11 @@
 name: Publish
 
-# Publishes the VSIX attached to a GitHub release to the Visual Studio Marketplace. The VSIX is
-# the release asset, never a rebuild. A maintainer approves every publication through the
-# environment "marketplace" (required reviewers, release tags only), and the Marketplace accepts
-# the job through trusted publishing (OIDC), without a stored token. Versions on the Marketplace
-# are final, so a version that is already published is skipped: a run can always be repeated.
+# Publishes the VSIX attached to a GitHub release to the Visual Studio Marketplace and Open VSX.
+# The VSIX is the release asset, never a rebuild. A maintainer approves every publication through
+# the environments "marketplace" and "openvsx" (required reviewers, release tags and main only),
+# and both registries accept the jobs through trusted publishing (OIDC), without a stored token.
+# Versions are final on both, so a version that is already published is skipped: a run, or one of
+# its jobs, can always be repeated.
 #
 # Started by a published release (not drafts or pre-releases), or by hand from main with a tag
 # as input, for a repeated or trial run: older tags do not contain this workflow. Either way, only
@@ -108,7 +109,7 @@ jobs:
         name: Check whether the version is already published
         working-directory: packages/extension
         run: |
-          versions="$(npx vsce show "$EXTENSION" --json | jq -r '.versions[].version')"
+          versions="$(npx --no-install vsce show "$EXTENSION" --json | jq -r '.versions[].version')"
           if grep -qxF "$VERSION" <<< "$versions"; then
             echo "Version $VERSION of $EXTENSION is already on the Marketplace; skipping."
             echo "exists=true" >> "$GITHUB_OUTPUT"
@@ -118,4 +119,60 @@ jobs:
       - name: Publish
         if: steps.published.outputs.exists == 'false'
         working-directory: packages/extension
-        run: npx vsce publish --packagePath "$RUNNER_TEMP/vscode-lorequill-$VERSION.vsix" --oidc
+        run: npx --no-install vsce publish --packagePath "$RUNNER_TEMP/vscode-lorequill-$VERSION.vsix" --oidc
+
+  openvsx:
+    name: Open VSX
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: openvsx
+      url: https://open-vsx.org/extension/potamico/vscode-lorequill
+    permissions:
+      contents: read
+      # Trusted publishing: Open VSX exchanges the job's OIDC token for a short-lived credential.
+      # The trusted publisher of the extension names this repository, publish.yml, and the
+      # environment. No access token (OVSX_PAT) is set, since one would take precedence.
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      VERSION: ${{ needs.verify.outputs.version }}
+      DIGEST: ${{ needs.verify.outputs.digest }}
+    steps:
+      # ovsx comes from the lockfile of the tagged commit, with its integrity hashes.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.TAG }}
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Download the verified VSIX
+        run: |
+          file="vscode-lorequill-$VERSION.vsix"
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "$file" --dir "$RUNNER_TEMP"
+          test "sha256:$(sha256sum "$RUNNER_TEMP/$file" | cut -d ' ' -f 1)" = "$DIGEST"
+      - id: published
+        name: Check whether the version is already published
+        run: |
+          status="$(curl -sS -o /dev/null -w '%{http_code}' \
+            "https://open-vsx.org/api/${EXTENSION/.//}/$VERSION")"
+          case "$status" in
+            200)
+              echo "Version $VERSION of $EXTENSION is already on Open VSX; skipping."
+              echo "exists=true" >> "$GITHUB_OUTPUT"
+              ;;
+            404) echo "exists=false" >> "$GITHUB_OUTPUT" ;;
+            *)
+              echo "::error::Open VSX answered HTTP $status for $EXTENSION $VERSION."
+              exit 1
+              ;;
+          esac
+      - name: Publish
+        if: steps.published.outputs.exists == 'false'
+        working-directory: packages/extension
+        run: npx --no-install ovsx publish "$RUNNER_TEMP/vscode-lorequill-$VERSION.vsix" --trusted-publishing --skip-duplicate
