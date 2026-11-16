@@ -1,0 +1,120 @@
+name: Publish
+
+# Publishes the VSIX attached to a GitHub release to the Visual Studio Marketplace. The VSIX is
+# the release asset, never a rebuild. A maintainer approves every publication through the
+# environment "marketplace" (required reviewers, release tags only), and the Marketplace accepts
+# the job through trusted publishing (OIDC), without a stored token. Versions on the Marketplace
+# are final, so a version that is already published is skipped: a run can always be repeated.
+#
+# Started by a published release (not drafts or pre-releases), or by hand with a tag for a
+# repeated or trial run; choose the tag under "Use workflow from".
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag, such as v0.4.0
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+env:
+  EXTENSION: potamico.vscode-lorequill
+
+jobs:
+  verify:
+    name: Verify the release VSIX
+    if: github.event_name == 'workflow_dispatch' || !github.event.release.prerelease
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.tag.outputs.version }}
+      digest: ${{ steps.digest.outputs.digest }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+    steps:
+      - id: tag
+        name: Check the tag
+        run: |
+          if [[ ! "$TAG" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "::error::Not a release tag: $TAG"
+            exit 1
+          fi
+          echo "version=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+      - id: digest
+        name: Download the VSIX and check it against the release
+        env:
+          VERSION: ${{ steps.tag.outputs.version }}
+        run: |
+          file="vscode-lorequill-$VERSION.vsix"
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "$file"
+          # The digest GitHub recorded for the asset when it was uploaded.
+          expected="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets \
+            --jq ".assets[] | select(.name == \"$file\") | .digest")"
+          actual="sha256:$(sha256sum "$file" | cut -d ' ' -f 1)"
+          echo "Release asset $file: $actual"
+          test -n "$expected"
+          test "$expected" = "$actual"
+          # The manifest inside the VSIX names this extension and the tag's version.
+          manifest="$(unzip -p "$file" extension/package.json)"
+          test "$(jq -r '.publisher + "." + .name' <<< "$manifest")" = "$EXTENSION"
+          test "$(jq -r .version <<< "$manifest")" = "$VERSION"
+          echo "digest=$actual" >> "$GITHUB_OUTPUT"
+
+  marketplace:
+    name: Visual Studio Marketplace
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: marketplace
+      url: https://marketplace.visualstudio.com/items?itemName=potamico.vscode-lorequill
+    permissions:
+      contents: read
+      # Trusted publishing: the job's OIDC token is exchanged for a short-lived Marketplace
+      # credential. The Marketplace policy names this repository, publish.yml, and the environment.
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      VERSION: ${{ needs.verify.outputs.version }}
+      DIGEST: ${{ needs.verify.outputs.digest }}
+    steps:
+      # vsce comes from the lockfile of the tagged commit, with its integrity hashes.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.TAG }}
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Download the verified VSIX
+        run: |
+          file="vscode-lorequill-$VERSION.vsix"
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "$file" --dir "$RUNNER_TEMP"
+          test "sha256:$(sha256sum "$RUNNER_TEMP/$file" | cut -d ' ' -f 1)" = "$DIGEST"
+      - id: published
+        name: Check whether the version is already published
+        working-directory: packages/extension
+        run: |
+          versions="$(npx vsce show "$EXTENSION" --json | jq -r '.versions[].version')"
+          if grep -qxF "$VERSION" <<< "$versions"; then
+            echo "Version $VERSION of $EXTENSION is already on the Marketplace; skipping."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Publish
+        if: steps.published.outputs.exists == 'false'
+        working-directory: packages/extension
+        run: npx vsce publish --packagePath "$RUNNER_TEMP/vscode-lorequill-$VERSION.vsix" --oidc
