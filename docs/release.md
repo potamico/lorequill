@@ -83,8 +83,8 @@ Releases are made from `main` by a maintainer. Nothing is published automaticall
    then waits in the environment `marketplace` until a maintainer approves the deployment under
    _Actions → Publish → Review deployments_. Decline the deployment for a release that should not
    go to the Marketplace. A version that is already on the Marketplace is skipped, so the
-   workflow can be started again by hand (_Run workflow_, with the release tag under _Use
-   workflow from_ and as input), for example after a failure.
+   workflow can be started again by hand (_Run workflow_ from `main`, with the release tag as
+   input), for example after a failure.
 
    Open VSX is published by hand for now:
 

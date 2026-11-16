@@ -6,8 +6,9 @@ name: Publish
 # the job through trusted publishing (OIDC), without a stored token. Versions on the Marketplace
 # are final, so a version that is already published is skipped: a run can always be repeated.
 #
-# Started by a published release (not drafts or pre-releases), or by hand with a tag for a
-# repeated or trial run; choose the tag under "Use workflow from".
+# Started by a published release (not drafts or pre-releases), or by hand from main with a tag
+# as input, for a repeated or trial run: older tags do not contain this workflow. Either way, only
+# the verified VSIX of the release of that tag is published, and only after approval.
 on:
   release:
     types: [published]

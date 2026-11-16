@@ -303,7 +303,8 @@ Windows runners.
   and the domain verified for the account or organization. The DNS of `potamico.org` has a
   `CNAME` record `lorequill` pointing to `potamico.github.io`.
 - **Environment `marketplace`** for `publish.yml`: required reviewers (the maintainers), no
-  administrator bypass, and deployments only from tags matching `v*`. It holds no secrets. The
+  administrator bypass, and deployments only from tags matching `v*` and from the branch `main`
+  (manual runs start from `main` with the tag as input). It holds no secrets. The
   Marketplace publisher `potamico` has a trusted publishing policy for the owner `potamico`, the
   repository `lorequill`, the workflow `publish.yml`, and this environment; renaming the workflow
   or the environment breaks publishing until the policy is updated.
