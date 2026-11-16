@@ -20,8 +20,11 @@ Releases are made from `main` by a maintainer. Nothing is published automaticall
   publish a newer one, or unpublish the extension instead of removing it.
 - **Open VSX.** VS Code forks such as VSCodium and Cursor install from <https://open-vsx.org>.
   Publishing needs a GitHub sign-in, an Eclipse account with the signed publisher agreement, the
-  namespace `potamico` (`npx ovsx create-namespace potamico`), and an Open VSX token. Claim the
-  namespace's verification with an issue in `EclipseFdn/open-vsx.org`.
+  namespace `potamico` (`npx ovsx create-namespace potamico`). Releases are published by
+  `publish.yml` through Open VSX trusted publishing: the extension `potamico.vscode-lorequill`
+  has a trusted publisher for the repository `potamico/lorequill`, the workflow `publish.yml`,
+  and the environment `openvsx`, so no token is stored. Claim the namespace's verification with
+  an issue in `EclipseFdn/open-vsx.org`.
 - **Versions are final.** Neither the Marketplace nor Open VSX accepts a version a second time.
 
 ## Steps
@@ -80,20 +83,15 @@ Releases are made from `main` by a maintainer. Nothing is published automaticall
 9. **Publish the extension.** Publishing the GitHub release starts the workflow `publish.yml`
    (drafts and pre-releases do not). It downloads the VSIX from the release, checks it against
    the digest GitHub recorded for the asset and the extension and version in its manifest, and
-   then waits in the environment `marketplace` until a maintainer approves the deployment under
-   _Actions → Publish → Review deployments_. Decline the deployment for a release that should not
-   go to the Marketplace. A version that is already on the Marketplace is skipped, so the
-   workflow can be started again by hand (_Run workflow_ from `main`, with the release tag as
-   input), for example after a failure.
+   then waits in the environments `marketplace` and `openvsx` until a maintainer approves the
+   deployments under _Actions → Publish → Review deployments_; both can be approved together.
+   Decline a deployment for a release that should not go to that registry. A version that is
+   already published is skipped, so the workflow, or one of its jobs, can be started again by
+   hand (_Run workflow_ from `main`, with the release tag as input), for example after a failure.
 
-   Open VSX is published by hand for now:
-
-   ```bash
-   npx ovsx publish vscode-lorequill-<version>.vsix
-   ```
-
-   Publish the exact VSIX of the release, never a rebuilt one. If the workflow cannot publish, the
-   same VSIX can be uploaded on the Marketplace by hand.
+   If the workflow cannot publish, upload the same VSIX by hand: on the Marketplace's publisher
+   page, and with `npx ovsx publish vscode-lorequill-<version>.vsix` and an Open VSX token. Publish
+   the exact VSIX of the release, never a rebuilt one.
 
 ## Using a release in CI
 
