@@ -10,9 +10,10 @@ Releases are made from `main` by a maintainer. Nothing is published automaticall
 ## Publishing accounts
 
 - **Visual Studio Marketplace.** The publisher `potamico` belongs to the Potamico Microsoft
-  account. Publishing with `vsce` needs an Azure DevOps personal access token with the
-  _Marketplace (Manage)_ scope, or a Microsoft Entra sign-in; the VSIX can also be uploaded on
-  <https://marketplace.visualstudio.com/manage>. The extension is `potamico.vscode-lorequill` with
+  account. Releases are published by the workflow `publish.yml` through the Marketplace's
+  trusted publishing: the publisher has a policy for the repository `potamico/lorequill`, the
+  workflow `publish.yml`, and the environment `marketplace`, so no token is stored. By hand, the
+  VSIX can still be uploaded on <https://marketplace.visualstudio.com/manage>. The extension is `potamico.vscode-lorequill` with
   the display name "Lorequill – Structured Knowledge Documentation".
 - **Never delete an extension on the Marketplace.** Its name and display name stay reserved after
   deletion and cannot be used again, not even by the same publisher. To withdraw a version,
@@ -76,14 +77,23 @@ Releases are made from `main` by a maintainer. Nothing is published automaticall
    artifact of the CI run for the tagged commit) with its content digest in the notes. Name the
    commit SHA of the tag in the notes, for pinning the Action.
 
-9. **Publish the extension**, when the release is meant for the Marketplace:
+9. **Publish the extension.** Publishing the GitHub release starts the workflow `publish.yml`
+   (drafts and pre-releases do not). It downloads the VSIX from the release, checks it against
+   the digest GitHub recorded for the asset and the extension and version in its manifest, and
+   then waits in the environment `marketplace` until a maintainer approves the deployment under
+   _Actions → Publish → Review deployments_. Decline the deployment for a release that should not
+   go to the Marketplace. A version that is already on the Marketplace is skipped, so the
+   workflow can be started again by hand (_Run workflow_ from `main`, with the release tag as
+   input), for example after a failure.
+
+   Open VSX is published by hand for now:
 
    ```bash
-   npx vsce publish --packagePath dist/vscode-lorequill-<version>.vsix
-   npx ovsx publish dist/vscode-lorequill-<version>.vsix
+   npx ovsx publish vscode-lorequill-<version>.vsix
    ```
 
-   Publish the exact VSIX that was verified, never a rebuilt one.
+   Publish the exact VSIX of the release, never a rebuilt one. If the workflow cannot publish, the
+   same VSIX can be uploaded on the Marketplace by hand.
 
 ## Using a release in CI
 
