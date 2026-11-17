@@ -9,6 +9,7 @@ import {
   cellSource,
   escapeCell,
   setCell,
+  sourceOffset,
   tableCells,
   deleteColumn,
   deleteRow,
@@ -321,5 +322,36 @@ describe("deleteTable", () => {
 
   it("does nothing outside a table", () => {
     expect(run("Just ^text", deleteTable)).toBeUndefined();
+  });
+});
+
+describe("sourceOffset for a click on a rendered cell", () => {
+  it("is exact for plain text", () => {
+    expect(sourceOffset("Tea and coffee", "Tea and coffee", 4)).toBe(4);
+    expect(sourceOffset("Tea", "Tea", 0)).toBe(0);
+    expect(sourceOffset("Tea", "Tea", 3)).toBe(3);
+  });
+
+  it("skips Markdown syntax that is not rendered", () => {
+    // **bold** text: before "text" is rendered offset 5, source offset 9.
+    expect(sourceOffset("**bold** text", "bold text", 5)).toBe(9);
+    // Inside the bold word: after "bo".
+    expect(sourceOffset("**bold** text", "bold text", 2)).toBe(4);
+    // At the start: after the opening markers, inside the formatting.
+    expect(sourceOffset("**bold** text", "bold text", 0)).toBe(2);
+    expect(sourceOffset("`code` x", "code x", 4)).toBe(5);
+    expect(sourceOffset("a \\| b", "a | b", 3)).toBe(4);
+  });
+
+  it("skips a link's destination", () => {
+    // [Docs](https://example.com) here: before "here" is rendered offset 5.
+    const source = "[Docs](https://example.com) here";
+    expect(source.slice(sourceOffset(source, "Docs here", 5))).toBe("here");
+  });
+
+  it("stays inside the source", () => {
+    expect(sourceOffset("abc", "abc", 99)).toBe(3);
+    expect(sourceOffset("abc", "abc", -1)).toBe(0);
+    expect(sourceOffset("", "", 0)).toBe(0);
   });
 });
