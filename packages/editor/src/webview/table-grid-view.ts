@@ -10,6 +10,7 @@ import {
   nextCell,
   previousCell,
   setCell,
+  sourceOffset,
   tableCells,
   tableEnter,
   type CellAddress,
@@ -173,6 +174,32 @@ function leave(view: EditorView, address: CellAddress, where: "before" | "after"
   }
   view.dispatch({ selection: EditorSelection.cursor(anchor), scrollIntoView: true });
   view.focus();
+}
+
+/**
+ * Where a click lands in a cell's Markdown text (#11): the caret position under the pointer in the
+ * rendered cell, mapped to the source. `end` when the browser cannot tell, for example for a
+ * click on the cell's padding.
+ */
+function clickCaret(
+  view: EditorView,
+  grid: HTMLElement,
+  cell: HTMLTableCellElement,
+  event: MouseEvent,
+): number | "end" {
+  const position = document.caretPositionFromPoint(event.clientX, event.clientY);
+  if (!position || !cell.contains(position.offsetNode)) {
+    return "end";
+  }
+  const before = document.createRange();
+  before.selectNodeContents(cell);
+  before.setEnd(position.offsetNode, position.offset);
+  const address = addressOf(view, grid, cell);
+  const source = address ? cellSource(view.state, address)?.text : undefined;
+  if (source === undefined) {
+    return "end";
+  }
+  return sourceOffset(source, cell.textContent, before.toString().length);
 }
 
 /** Turns a cell into a one-line input with its Markdown text and focuses it. */
@@ -414,7 +441,7 @@ export class TableGridWidget extends WidgetType {
       const cell = event.target.closest<HTMLTableCellElement>("td, th");
       if (cell) {
         event.preventDefault();
-        edit(view, grid, cell, "end");
+        edit(view, grid, cell, clickCaret(view, grid, cell, event));
       }
     });
     // A right click edits the clicked cell first, so the context menu's table tools act on it.

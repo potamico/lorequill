@@ -607,3 +607,31 @@ export function setCell(
   }
   return rewrite(state, table, rows, table.alignments, { ...address, offset }, "", "input.type");
 }
+
+/**
+ * Maps a caret offset in the rendered text of a cell to an offset in its Markdown source, for a
+ * click on a grid cell (#11). The rendered text is the source without its syntax, so the source
+ * is walked while matching it character by character against the rendered text; characters that
+ * do not match, such as `**`, backticks, or a link's destination, are syntax and are skipped. A
+ * caret at the end of a rendered word stays before the syntax that closes it. For plain text the
+ * offset is exact, for formatted text it is close; it never leaves the source.
+ */
+export function sourceOffset(source: string, rendered: string, offset: number): number {
+  const target = Math.min(Math.max(offset, 0), rendered.length);
+  if (target === 0) {
+    // Before any rendered character: after the syntax that opens the first one.
+    const first = rendered.charAt(0);
+    const index = first === "" ? -1 : source.indexOf(first);
+    return index < 0 ? 0 : index;
+  }
+  let matched = 0;
+  for (let index = 0; index < source.length; index++) {
+    if (source[index] === rendered[matched]) {
+      matched++;
+      if (matched === target) {
+        return index + 1;
+      }
+    }
+  }
+  return source.length;
+}

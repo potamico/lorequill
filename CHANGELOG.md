@@ -7,6 +7,11 @@ the check engine, the CLI, and the GitHub Action. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- A click on a table cell puts the caret where the cell was clicked, also in formatted text,
+  instead of at the end of the cell.
+
 ## [0.3.0] - 2026-11-14
 
 ### Added
