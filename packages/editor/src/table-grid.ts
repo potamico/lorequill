@@ -10,7 +10,8 @@ export interface TableBlock {
   readonly to: number;
   /**
    * Where the text of each cell starts, per rendered row: the header first, then the body rows,
-   * without the delimiter row. A click on a cell puts the cursor there.
+   * without the delimiter row. The grid uses the number of rows for its estimated height and to
+   * enter the last row from below.
    */
   readonly cells: readonly (readonly number[])[];
 }
@@ -62,21 +63,4 @@ function cellStarts(state: EditorState, row: SyntaxNode): number[] {
     }
     return position;
   });
-}
-
-/**
- * The source position for a click on a rendered cell. Rows or cells the source does not have
- * (GFM fills short rows) fall back to the end of the row's line or the start of the table.
- */
-export function cellPosition(
-  state: EditorState,
-  table: TableBlock,
-  row: number,
-  column: number,
-): number {
-  const cells = table.cells[row];
-  if (!cells) {
-    return table.from;
-  }
-  return cells[column] ?? state.doc.lineAt(cells[0] ?? table.from).to;
 }

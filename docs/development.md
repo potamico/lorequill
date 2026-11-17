@@ -353,7 +353,9 @@ git ls-remote https://github.com/actions/checkout 'refs/tags/v7*'
   - `micromark+4.0.3.patch`: micromark rebuilt the whole event list whenever a quote or list
     closed, which is quadratic in their number (a 1 MiB page of quotes took over 100 seconds). The
     patch only changes the end of the list and yields identical syntax trees. Guarded by
-    `packages/editor/test/unit/budget.test.ts`.
+    `packages/editor/test/unit/budget.test.ts`. Reported upstream as
+    [micromark#263](https://github.com/micromark/micromark/issues/263); removing the patch is
+    tracked in [#14](https://github.com/potamico/lorequill/issues/14).
 - TypeScript is pinned to the 6.0 line because `typescript-eslint` does not yet support
   TypeScript 7. Revisit this when `typescript-eslint` adds support.
 

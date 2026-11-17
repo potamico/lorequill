@@ -20,10 +20,8 @@ export {
 } from "./protocol";
 export {
   fromSequentialChanges,
-  offsetOf,
   positionOf,
   SyncClient,
-  toTextChanges,
   type SyncClientOptions,
   type ViewInstruction,
 } from "./sync-client";

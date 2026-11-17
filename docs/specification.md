@@ -55,16 +55,9 @@ This is a VS Code extension, language server, and reusable check engine, not a w
 
 ### Follow-on features (not blocking MVP acceptance)
 
-- Incoming/outgoing link panels and hover previews.
-- Unlinked-mention discovery and conversion, including reverse mentions.
-- MkDocs navigation notice.
-- Live-preview widgets beyond the MVP set of §8.
-- A floating formatting toolbar shown next to a text selection.
-- Paste as Markdown: converting rich clipboard content (for example from a word processor or browser) into Markdown text on paste.
-- Focus mode (dims everything except the current paragraph) and typewriter mode (keeps the current line vertically centered).
-- Emoji shortcode completion (`:name:`) for repositories that enable emoji support.
-- Rendered-preview support for Mermaid diagrams, math, and footnote hover, using locally bundled libraries in their strictest security configuration.
-- GitLab adapter (separate milestone after MVP).
+Follow-on features are planned as GitHub issues with the label
+[`enhancement`](https://github.com/potamico/lorequill/issues?q=is%3Aissue+label%3Aenhancement);
+the label `idea` marks those without a commitment yet.
 
 Follow-on features must reuse the same document, parser, path-resolution, and Git contracts. They must not introduce an alternative document store.
 

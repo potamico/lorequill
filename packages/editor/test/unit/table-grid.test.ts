@@ -2,7 +2,7 @@ import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { ensureSyntaxTree } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
 import { describe, expect, it } from "vitest";
-import { cellPosition, findTables } from "../../src/table-grid";
+import { findTables } from "../../src/table-grid";
 
 function stateOf(doc: string): EditorState {
   const state = EditorState.create({ doc, extensions: markdown({ base: markdownLanguage }) });
@@ -46,19 +46,5 @@ describe("findTables", () => {
   it("leaves tables in lists and quotes as source", () => {
     const state = stateOf("- item\n\n  | a | b |\n  |---|---|\n  | 1 | 2 |\n\n> | a |\n> |---|\n");
     expect(findTables(state)).toEqual([]);
-  });
-});
-
-describe("cellPosition", () => {
-  it("maps rendered cells to source positions and falls back for missing cells", () => {
-    const doc = "| a | b |\n|---|---|\n| 1 |\n";
-    const state = stateOf(doc);
-    const [table] = findTables(state);
-    if (!table) {
-      throw new Error("no table");
-    }
-    expect(doc.slice(cellPosition(state, table, 0, 1))).toMatch(/^b \|/);
-    expect(cellPosition(state, table, 1, 1)).toBe(state.doc.line(3).to);
-    expect(cellPosition(state, table, 5, 0)).toBe(table.from);
   });
 });
