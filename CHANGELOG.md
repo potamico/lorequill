@@ -7,6 +7,8 @@ the check engine, the CLI, and the GitHub Action. The format follows
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-11-17
+
 ### Changed
 
 - A click on a table cell puts the caret where the cell was clicked, also in formatted text,
@@ -82,6 +84,7 @@ identifier `potamico.vscode-lorequill`.
 - User guide, specification, decisions, privacy notice, release procedure, and acceptance
   traceability.
 
-[Unreleased]: https://github.com/potamico/lorequill/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/potamico/lorequill/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/potamico/lorequill/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/potamico/lorequill/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/potamico/lorequill/releases/tag/v0.2.0
