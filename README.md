@@ -16,7 +16,8 @@ runs locally and in CI.
 ## Capabilities
 
 - Pages view for the Markdown files of a repository, with drafts and a filter.
-- Page editor based on CodeMirror with live preview, a rendered preview, and a Source mode.
+- Page editor based on CodeMirror with live preview, a table grid, a rendered preview, and a
+  Source mode. It opens any Markdown file, also in a folder without a profile.
 - Properties view for front matter edits that keep comments, unknown keys, and the body.
 - Page creation, link insertion and completion, links that follow moved pages, and stable links.
 - A shared check engine with six declarative rules, a language server, a CLI, and a GitHub Action.

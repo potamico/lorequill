@@ -306,6 +306,22 @@ describe("message validation", () => {
       parseHostMessage({ type: "init", version: 1, text: "x", settings, labels: { toolbar: 1 } }),
     ).toBeUndefined();
     expect(parseHostMessage({ type: "command", command: "rm -rf" })).toBeUndefined();
+    // The editing context: managed or plain, with the page's place for preview images.
+    expect(parseHostMessage({ type: "context", managed: true })).toEqual({
+      type: "context",
+      managed: true,
+    });
+    const located = {
+      type: "context",
+      managed: false,
+      page: { path: "notes/a.md", resourceBase: "https://example.test/root/" },
+    };
+    expect(parseHostMessage(located)).toEqual(located);
+    expect(parseHostMessage({ type: "context", managed: "yes" })).toBeUndefined();
+    expect(parseHostMessage({ type: "context", managed: true, extra: 1 })).toBeUndefined();
+    expect(
+      parseHostMessage({ type: "context", managed: true, page: { path: "../a.md" } }),
+    ).toBeUndefined();
     expect(
       parseHostMessage({ type: "settings", settings: { ...settings, maxTextWidth: 0 } }),
     ).toEqual({ type: "settings", settings: { ...settings, maxTextWidth: 0 } });

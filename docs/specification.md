@@ -80,6 +80,7 @@ Real-time collaboration, CRDT, WYSIWYG editing through a separate document model
 | Staged | File content is in the Git index for the next commit |
 | Checked | A specific immutable content snapshot has passed the configured checks; the snapshot identity is retained with the result |
 | Editable page | An included Markdown file offered in the Pages tree and managed editor |
+| Plain Markdown file | A Markdown file that is not an editable page of a ready profile: its folder has no profile or an invalid one, or the file lies outside the content scope. It can be edited in the Lorequill editor without the managed features (§8) |
 | Valid link target | A resolvable regular file within the content root, including excluded Markdown files and non-Markdown files such as PDFs; fragments are validated only for Markdown targets |
 | Check scope | Included pages, plus any other files expressly required by a built-in rule for reference resolution |
 | Committed | Selected content has been committed to the current branch |
@@ -90,7 +91,7 @@ The editor's document save status is separate from Git status. A document can be
 
 ## 4. Installation and architecture
 
-The author installs VS Code, Git, and this extension, opens an existing clone, trusts the workspace, and authenticates to a supported Git host only when a remote operation is needed. Python, GitHub CLI, and a second VS Code extension are not required. The extension bundles the language server and editor assets. Readers can use the Git host without installing anything.
+The author installs VS Code, Git, and this extension, opens an existing clone, trusts the workspace, and authenticates to a supported Git host only when a remote operation is needed. Python, GitHub CLI, and a second VS Code extension are not required. The extension bundles the language server and editor assets. Readers can use the Git host without installing anything. The extension activates in a workspace folder with a profile, or when the Lorequill editor is opened for a Markdown file; it stays inactive otherwise.
 
 ```text
 Visual Studio Code
@@ -200,6 +201,8 @@ Diagnostics for the editing snapshot, including unsaved buffers, update automati
 The Pages tree (`Pages`) lives in the Lorequill view container (§4) and shows included directories/pages. Labels come from front matter `title`, otherwise the first Markdown heading, otherwise the filename. Filtering searches title, filename, and string aliases. Excluded pages do not appear in this tree, but exclusion from editing does not by itself make a legitimate repository link invalid.
 
 The page outline (`Outline`) is a native tree view in the same container, below `Pages`. It shows the headings of the page in the active Lorequill editor, nested by level and taken from the same syntax tree as anchors (§10), so front matter and code blocks never produce entries. It updates shortly after typing pauses. Selecting a heading moves the editor's cursor to that heading and scrolls it to the top; moving the cursor selects the heading of the current section. The built-in Outline view does not cover custom editors, and the outline is empty while no Lorequill editor is active.
+
+**Plain editing.** The Lorequill editor also opens a plain Markdown file (§3): **Open in Lorequill Editor** in the Explorer context menu and the command palette, or VS Code's _Open With_. A plain file gets the editor with all view modes and formatting, the outline, the Properties view with widgets inferred from the front matter values, Ctrl+click on links, and link completion and Insert Link over the Markdown files of its workspace folder with `ascii` anchors; the preview loads images from the workspace folder, or from the file's own directory when no folder is open. Everything that needs a profile is absent rather than failing: the Pages tree and New Page, checks and diagnostics, Commit and Submit for Review (also in the editor toolbar and the Source Control title), link updates on move, and stable links. The Pages view of a folder without a profile says so and links to the getting-started page. Workspace trust applies unchanged (§15).
 
 A directory's plus action creates a page in that exact directory. The author supplies a title and always sees an editable proposed filename (`File name`). A collision with an existing file, invalid filename, or path escape is rejected. Filename changes after publication are out of scope; ordinary Git file operations outside the extension remain possible and must not corrupt its state.
 
@@ -414,7 +417,7 @@ The SHA placeholders stand for the full commit SHAs of the release tags. CI eval
 52. An edit in `Edit` changes only the edited range; Material constructs, unsupported syntax, and whitespace outside it remain byte-identical.
 53. Toggling a task checkbox in live preview changes exactly one character of the text document and is undoable.
 54. Toolbar undo/redo and the keyboard shortcuts use the same VS Code history, including properties-panel edits.
-55. The rendered preview shows no raw HTML from page content, loads no remote resources, runs no page scripts, and does not resolve links or images outside the content root.
+55. The rendered preview shows no raw HTML from page content, loads no remote resources, runs no page scripts, and does not resolve links or images outside the content root (for a plain Markdown file: outside its workspace folder, or its own directory without one).
 56. In `Both`, scrolling either side keeps the corresponding source line and rendered block aligned within the documented tolerance.
 57. Find and replace finds matches outside the visible area, and a replace-all is a single undo step.
 58. Enter, Tab, and Shift+Tab in lists and automatic closing of paired markers each produce one undoable edit and never change text outside the current item.
@@ -423,6 +426,7 @@ The SHA placeholders stand for the full commit SHAs of the release tags. CI eval
 61. Links inside Material admonitions, collapsible blocks, and content tabs are found and checked; their indented bodies are not treated as code.
 62. The interface language follows the VS Code display language regardless of the profile `locale`; the profile `locale` only affects repository-facing content.
 63. Opening a Markdown file outside the content scope uses the built-in editor; pages from the Pages tree open in the Lorequill editor, and the editor-title action switches between both editors.
+64. In a folder without a profile, the extension stays inactive until the Lorequill editor is opened. A plain Markdown file then gets the editor, Outline, Properties, and link completion over the folder's Markdown files; the toolbar offers no Check Pages, Commit, or Submit, and the Pages view explains the missing profile without an error. Adding a profile makes the open editor managed, and removing it makes it plain again.
 
 Unit and fixture tests cover parsing, YAML, slugs, rules, snapshots, and link resolution. VS Code integration tests cover document synchronization, native save, webviews, commands, and multi-root behavior. Git integration tests use disposable local repositories with dirty worktrees, pre-staged files, partial staging, concurrent index changes, commit hooks, and multiple branches. Host API tests use a mock adapter plus a disposable remote integration repository.
 

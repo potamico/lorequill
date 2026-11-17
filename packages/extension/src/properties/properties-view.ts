@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import { posix } from "node:path";
 import {
   PROPERTIES_LABEL_KEYS,
   parsePropertiesWebviewMessage,
@@ -12,6 +13,7 @@ import * as vscode from "vscode";
 import type { MessageKey, Translate } from "../core/i18n";
 import { planPropertyEdit, type PropertyRequest } from "../core/properties/edits";
 import { buildPropertiesModel } from "../core/properties/model";
+import { PAGE_EDITOR_VIEW_TYPE } from "../editor/page-editor";
 import type { FolderRegistry } from "../folders/folder-registry";
 import { pathInside } from "../folders/uri-paths";
 
@@ -22,7 +24,11 @@ const REFRESH_DELAY_MS = 150;
 /** Attempts to apply one property edit when the document changes in between. */
 const MAX_ATTEMPTS = 3;
 
-/** The page the panel shows: a document of a ready folder, included in its content scope. */
+/**
+ * The page the panel shows: a document of a ready folder, included in its content scope, with the
+ * folder's collections; or a plain Markdown file open in the Lorequill editor, without
+ * collections, whose front matter keys get widgets inferred from their values (D28).
+ */
 interface ActivePage {
   readonly uri: vscode.Uri;
   readonly path: string;
@@ -122,6 +128,16 @@ export class PropertiesViewProvider implements vscode.WebviewViewProvider, vscod
       if (model.pages.some((page) => page.path === path)) {
         return { uri, path, collections: model.status.profile.collections ?? [] };
       }
+    }
+    // A plain Markdown file: only in the Lorequill editor, so the text editor of an unrelated
+    // file never fills the panel.
+    if (
+      this.registry.trusted &&
+      input instanceof vscode.TabInputCustom &&
+      input.viewType === PAGE_EDITOR_VIEW_TYPE &&
+      /\.md$/i.test(uri.path)
+    ) {
+      return { uri, path: posix.basename(uri.path), collections: [] };
     }
     return undefined;
   }

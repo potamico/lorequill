@@ -19,8 +19,18 @@ guide uses the English names.
    the secondary side bar.
 
 Lorequill becomes active in folders that contain `.lorequill/config.yaml`, the repository profile.
-If the profile is missing or invalid, the Pages view says why, and selecting the message opens the
-profile at the problem.
+If the profile is invalid, the Pages view says why, and selecting the message opens the profile at
+the problem.
+
+### Without a profile
+
+The editor also works on any Markdown file. Right-click a `.md` file in the Explorer and choose
+**Open in Lorequill Editor**, or run the command of the same name. You get the editor with live
+preview and the table grid, **Outline**, **Properties** for the front matter, and link completion
+for the Markdown files of the folder. Pages, checks, **Commit**, and **Submit for Review** need a
+profile; VS Code's own Git features stay available. Links are not updated when you move files; for
+that, VS Code has the setting `markdown.updateLinksOnFileMove.enabled`. Once you add a profile,
+open editors switch to the full feature set.
 
 ## The repository profile
 

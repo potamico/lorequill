@@ -83,6 +83,8 @@ interface SessionHost {
   complete(session: EditorSession, id: number, anchorsOf: string | undefined): Promise<void>;
   /** The page's place in its content root, for images in the rendered preview. */
   pageLocation(session: EditorSession, webview: vscode.Webview): PageLocation | undefined;
+  /** Whether the page belongs to a folder with a ready profile (managed editing). */
+  isManaged(uri: vscode.Uri): boolean;
 }
 
 function toRange(change: TextChange): vscode.Range {
@@ -126,6 +128,8 @@ class EditorSession implements EditorSessionProbe {
   position = { line: 0, character: 0 };
   /** The webview has received the document; until then a reveal waits. */
   private initialized = false;
+  /** The context last sent to the webview, to send it only when it changes. */
+  private lastContext: string | undefined;
   private pendingReveal: number | undefined;
 
   constructor(
@@ -217,6 +221,19 @@ class EditorSession implements EditorSessionProbe {
     this.post({ type: "settings", settings: readSettings(this.document) });
   }
 
+  /** Tells the webview whether the page is managed and where it lies, when that changed. */
+  sendContext(): void {
+    if (!this.initialized) {
+      return;
+    }
+    const context = { managed: this.host.isManaged(this.uri), ...this.pageField() };
+    const key = JSON.stringify(context);
+    if (key !== this.lastContext) {
+      this.lastContext = key;
+      this.post({ type: "context", ...context });
+    }
+  }
+
   sendDiagnostics(): void {
     this.post({ type: "diagnostics", diagnostics: toDiagnostics(this.document.uri) });
   }
@@ -233,6 +250,7 @@ class EditorSession implements EditorSessionProbe {
           ...this.pageField(),
         });
         this.initialized = true;
+        this.sendContext();
         this.sendDiagnostics();
         if (this.pendingReveal !== undefined) {
           this.post({ type: "reveal", line: this.pendingReveal });
@@ -368,6 +386,8 @@ export class PageEditorProvider
     /** The content root that contains a page, if the page belongs to a ready folder. */
     private readonly contentRootOf: (uri: vscode.Uri) => vscode.Uri | undefined = () => undefined,
     private readonly links?: LinkService,
+    /** Whether a file belongs to a folder with a ready profile. */
+    readonly isManaged: (uri: vscode.Uri) => boolean = () => false,
   ) {
     this.labels = readLabels(translate);
     // Status bar (§8): line and column, words and reading time, and the document save state.
@@ -443,13 +463,13 @@ export class PageEditorProvider
     // Images of the rendered preview load from the page's workspace folder. The folder is known
     // when the editor is restored at startup, before the profile is loaded; the renderer itself
     // only produces image URIs inside the content root (§8).
-    const folder = vscode.workspace.getWorkspaceFolder(document.uri)?.uri;
+    // A file opened without a workspace folder may load images from its own directory.
+    const folder =
+      vscode.workspace.getWorkspaceFolder(document.uri)?.uri ??
+      vscode.Uri.joinPath(document.uri, "..");
     panel.webview.options = {
       enableScripts: true,
-      localResourceRoots: [
-        vscode.Uri.joinPath(this.extensionUri, "dist", "webview"),
-        ...(folder ? [folder] : []),
-      ],
+      localResourceRoots: [vscode.Uri.joinPath(this.extensionUri, "dist", "webview"), folder],
     };
     const session = new EditorSession(document, panel, this);
     this.sessions.add(session);
@@ -478,6 +498,13 @@ export class PageEditorProvider
       });
     });
     panel.webview.html = webviewHtml(panel.webview, this.extensionUri);
+  }
+
+  /** Tells every open editor its context again, after a profile or the page list changed. */
+  refreshContext(): void {
+    this.sessions.forEach((session) => {
+      session.sendContext();
+    });
   }
 
   /** Opens find or replace, or switches the view mode, in the active Lorequill editor. */
@@ -576,11 +603,15 @@ export class PageEditorProvider
     }
   }
 
+  /**
+   * Images of the preview load from the content root of a managed page. A plain Markdown file
+   * loads them from its workspace folder, or from its own directory without a workspace folder.
+   */
   pageLocation(session: EditorSession, webview: vscode.Webview): PageLocation | undefined {
-    const root = this.contentRootOf(session.uri);
-    if (!root) {
-      return undefined;
-    }
+    const root =
+      this.contentRootOf(session.uri) ??
+      vscode.workspace.getWorkspaceFolder(session.uri)?.uri ??
+      vscode.Uri.joinPath(session.uri, "..");
     const path = pathInside(root, session.uri);
     if (!path) {
       return undefined;
@@ -612,14 +643,14 @@ export class PageEditorProvider
   }
 
   async insertLink(session: EditorSession, selection: string): Promise<void> {
-    const link = await this.links?.pick(session.uri, selection);
+    const link = await this.links?.pick(session.uri, selection, { plain: true });
     if (link) {
       session.post({ type: "insertLink", text: link.text, destination: link.destination });
     }
   }
 
   async complete(session: EditorSession, id: number, anchorsOf: string | undefined): Promise<void> {
-    const items = (await this.links?.completions(session.uri, anchorsOf)) ?? [];
+    const items = (await this.links?.completions(session.uri, anchorsOf, { plain: true })) ?? [];
     session.post({ type: "completions", id, items: items.slice(0, LIMITS.maxCompletions) });
   }
 

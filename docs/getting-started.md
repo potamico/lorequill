@@ -5,6 +5,10 @@
 - VS Code 1.110 or newer and Git.
 - A Git clone of a documentation repository with Markdown pages, for example an MkDocs site.
 
+To try the editor first, right-click any `.md` file in the Explorer and choose **Open in Lorequill
+Editor**; it works without a profile. The steps below add the profile, which brings the Pages
+view, the checks, and review.
+
 ## 1. Add a profile
 
 Lorequill becomes active in a folder that contains `.lorequill/config.yaml`. A minimal profile for

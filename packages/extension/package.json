@@ -305,18 +305,18 @@
         {
           "id": "lorequill.pages",
           "name": "%lorequill.view.pages%",
-          "when": "lorequill.enabled"
+          "when": "lorequill.active"
         },
         {
           "id": "lorequill.outline",
           "name": "%lorequill.view.outline%",
-          "when": "lorequill.enabled"
+          "when": "lorequill.active"
         },
         {
           "type": "webview",
           "id": "lorequill.properties",
           "name": "%lorequill.view.properties%",
-          "when": "lorequill.enabled"
+          "when": "lorequill.active"
         }
       ]
     },
@@ -393,7 +393,7 @@
         },
         {
           "command": "lorequill.openInEditor",
-          "when": "resourcePath in lorequill.pagePaths && activeCustomEditorId != 'lorequill.pageEditor' && isWorkspaceTrusted"
+          "when": "resourceExtname =~ /^\\.md$/i && activeCustomEditorId != 'lorequill.pageEditor' && isWorkspaceTrusted"
         },
         {
           "command": "lorequill.openAsText",
@@ -527,7 +527,7 @@
       "editor/title": [
         {
           "command": "lorequill.openInEditor",
-          "when": "resourcePath in lorequill.pagePaths && activeCustomEditorId != 'lorequill.pageEditor' && isWorkspaceTrusted",
+          "when": "lorequill.active && resourceExtname =~ /^\\.md$/i && activeCustomEditorId != 'lorequill.pageEditor' && isWorkspaceTrusted",
           "group": "navigation@1"
         },
         {
@@ -635,6 +635,13 @@
           "command": "lorequill.editor.tableDelete",
           "when": "webviewId == 'lorequill.pageEditor' && webviewSection == 'tableCell'",
           "group": "5_table@2"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "lorequill.openInEditor",
+          "when": "resourceExtname =~ /^\\.md$/i && isWorkspaceTrusted",
+          "group": "navigation@25"
         }
       ]
     },

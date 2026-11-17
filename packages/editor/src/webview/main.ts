@@ -93,6 +93,15 @@ const previewCompartment = new Compartment();
 let labels: EditorLabels | undefined;
 let sourceMode = false;
 let sourceButton: HTMLButtonElement | undefined;
+/** Check Pages, Commit, and Submit: shown only for a page of a folder with a ready profile. */
+const managedButtons: HTMLButtonElement[] = [];
+let managed = false;
+
+function showManagedButtons(): void {
+  for (const button of managedButtons) {
+    button.hidden = !managed;
+  }
+}
 
 /** View modes of §8: `Edit`, `Both`, and `Preview`. */
 type ViewMode = "edit" | "both" | "view";
@@ -1016,6 +1025,26 @@ function buildToolbar(texts: EditorLabels): void {
     texts,
   );
   sourceButton.setAttribute("aria-pressed", String(sourceMode));
+  const managedActions = [
+    { label: "checkPages", icon: "checklist" },
+    { label: "commit", icon: "git-commit" },
+    { label: "submit", icon: "git-pull-request-create" },
+  ] as const;
+  managedButtons.length = 0;
+  managedButtons.push(
+    ...managedActions.map(({ label, icon }) =>
+      makeButton(
+        {
+          label,
+          icon,
+          run: () => {
+            request(label);
+          },
+        },
+        texts,
+      ),
+    ),
+  );
   endGroup.append(
     sourceButton,
     makeButton(
@@ -1028,38 +1057,10 @@ function buildToolbar(texts: EditorLabels): void {
       },
       texts,
     ),
-    makeButton(
-      {
-        label: "checkPages",
-        icon: "checklist",
-        run: () => {
-          request("checkPages");
-        },
-      },
-      texts,
-    ),
-    makeButton(
-      {
-        label: "commit",
-        icon: "git-commit",
-        run: () => {
-          request("commit");
-        },
-      },
-      texts,
-    ),
-    makeButton(
-      {
-        label: "submit",
-        icon: "git-pull-request-create",
-        run: () => {
-          request("submit");
-        },
-      },
-      texts,
-    ),
+    ...managedButtons,
   );
   toolbar.append(endGroup);
+  showManagedButtons();
 }
 
 function follow(instruction: ViewInstruction): void {
@@ -1141,6 +1142,15 @@ window.addEventListener("message", (event: MessageEvent) => {
       break;
     case "completions":
       completions.answer(message.id, message.items);
+      break;
+    case "context":
+      managed = message.managed;
+      showManagedButtons();
+      pageContext = message.page
+        ? { pagePath: message.page.path, resourceBase: message.page.resourceBase }
+        : {};
+      previewDirty = true;
+      schedulePreview();
       break;
     case "command":
       if (isTableCommand(message.command)) {

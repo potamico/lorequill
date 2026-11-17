@@ -77,6 +77,8 @@ export interface ScenarioWorkspaces {
    * content root lies in the nested repository `inner`.
    */
   readonly git: string;
+  /** Folder without a profile: plain Markdown files for the editor alone. */
+  readonly plain: string;
 }
 
 /** Creates the workspaces below `base`, replacing earlier ones. */
@@ -191,5 +193,13 @@ checks:
   const gitWorkspace = path.join(gitBase, "git.code-workspace");
   await writeFile(gitWorkspace, JSON.stringify({ folders: [{ path: "site" }, { path: "outer" }] }));
 
-  return { single, multiRoot: workspaceFile, checks, editor, git: gitWorkspace };
+  const plain = path.join(base, "plain");
+  await writeFiles(plain, {
+    "README.md": "# Readme\n\n[First](notes/first.md)\n",
+    "notes/first.md": "---\ntitle: First Note\ntags: [a, b]\n---\n# First\n\nText\n\n## Details\n",
+    "notes/second.md": "# Second Note\n",
+    "notes/data.txt": "not Markdown",
+  });
+
+  return { single, multiRoot: workspaceFile, checks, editor, git: gitWorkspace, plain };
 }

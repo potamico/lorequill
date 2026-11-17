@@ -103,7 +103,7 @@ describe("Pages view", () => {
 
   it("is contributed to the Lorequill view container and only after activation", () => {
     expect(view?.id).toBe("lorequill.pages");
-    expect(view?.when).toBe("lorequill.enabled");
+    expect(view?.when).toBe("lorequill.active");
     expect(manifest.contributes.views.explorer).toBeUndefined();
   });
 
@@ -112,6 +112,31 @@ describe("Pages view", () => {
     const workflow = readFileSync(resolve(packageRoot, "../../.github/workflows/ci.yml"), "utf8");
     expect(minimum).toBeDefined();
     expect(workflow).toContain(`vscode: "${minimum ?? ""}"`);
+  });
+
+  it("shows what needs a profile only with lorequill.enabled, and the editor everywhere", () => {
+    const menus = manifest.contributes.menus;
+    const when = (menu: string, command: string): string =>
+      menus[menu]?.find((item) => item.command === command)?.when ?? "";
+    // New Page, Check Pages, and the Git actions need a folder with a profile.
+    for (const command of ["lorequill.newPage", "lorequill.checkPages", "lorequill.commit"]) {
+      expect(when("commandPalette", command)).toContain("lorequill.enabled");
+    }
+    expect(when("scm/title", "lorequill.commit")).toContain("lorequill.enabled");
+    expect(when("scm/title", "lorequill.submit")).toContain("lorequill.enabled");
+    // The editor opens every Markdown file of a trusted workspace (#10). The Explorer and the
+    // palette offer it everywhere, the editor title only once Lorequill is active in the window.
+    const markdown = "resourceExtname =~ /^\\.md$/i";
+    expect(when("explorer/context", "lorequill.openInEditor")).toBe(
+      `${markdown} && isWorkspaceTrusted`,
+    );
+    expect(when("commandPalette", "lorequill.openInEditor")).toContain(markdown);
+    expect(when("editor/title", "lorequill.openInEditor")).toContain(
+      `lorequill.active && ${markdown}`,
+    );
+    for (const menu of ["explorer/context", "commandPalette", "editor/title"]) {
+      expect(when(menu, "lorequill.openInEditor")).not.toContain("lorequill.pagePaths");
+    }
   });
 
   it("has a Lorequill view container in the activity bar with a packaged icon", () => {
@@ -202,7 +227,7 @@ describe("Outline view", () => {
       "lorequill.outline",
       "lorequill.properties",
     ]);
-    expect(views[1]?.when).toBe("lorequill.enabled");
+    expect(views[1]?.when).toBe("lorequill.active");
   });
 
   it("is followed by the Properties webview view", () => {
@@ -210,7 +235,7 @@ describe("Outline view", () => {
       type: "webview",
       id: "lorequill.properties",
       name: "%lorequill.view.properties%",
-      when: "lorequill.enabled",
+      when: "lorequill.active",
     });
   });
 

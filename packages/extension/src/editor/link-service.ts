@@ -4,6 +4,7 @@ import {
   resolveLinkDestination,
   type AnchorSlugify,
 } from "@lorequill/markdown";
+import { createContentScope } from "@lorequill/profile";
 import * as vscode from "vscode";
 import type { Translate } from "../core/i18n";
 import {
@@ -14,7 +15,7 @@ import {
   slugifyOf,
   type AnchorItem,
 } from "../core/links/link-items";
-import type { PageEntry } from "../core/pages/scan";
+import { scanPages, type PageCache, type PageEntry } from "../core/pages/scan";
 import type { FolderRegistry } from "../folders/folder-registry";
 import { pathInside } from "../folders/uri-paths";
 
@@ -33,18 +34,85 @@ export interface ChosenLink {
   readonly destination: string;
 }
 
+/** Every Markdown file of a workspace folder: the link targets of a plain Markdown file. */
+const PLAIN_SCOPE = createContentScope({ include: ["**/*.md", "**/*.MD"] });
+
+/** The Markdown files of one workspace folder without a ready profile, listed on demand. */
+interface PlainFolder {
+  readonly cache: PageCache;
+  readonly watcher: vscode.Disposable;
+  pages?: Promise<readonly PageEntry[]>;
+}
+
 /**
  * Insert Link and link completion (specification §8, §10). Both offer the editable pages of the
  * source page's folder, write destinations with `relativeLinkPath`, and compute anchors with the
  * same code and `slugify` setting as the `relative-links` check, so what they insert is what the
  * check accepts. Target text comes from the open document if there is one (the current buffer),
  * otherwise from disk through the resolver's file provider, which stays inside the content root.
+ *
+ * A plain Markdown file, one that is not in the content root of a ready profile, links to the
+ * Markdown files of its workspace folder with the default `ascii` anchors. This is offered in
+ * the Lorequill editor only; the text editor gets completion for pages of a profile.
  */
-export class LinkService {
+export class LinkService implements vscode.Disposable {
+  private readonly plainFolders = new Map<string, PlainFolder>();
+
   constructor(
     private readonly registry: FolderRegistry,
     private readonly translate: Translate,
   ) {}
+
+  dispose(): void {
+    for (const folder of this.plainFolders.values()) {
+      folder.watcher.dispose();
+    }
+    this.plainFolders.clear();
+  }
+
+  /** `uri` as a link source: a page of a profile, or else a plain file of a workspace folder. */
+  private async sourceOrPlain(uri: vscode.Uri): Promise<SourcePage | undefined> {
+    return this.sourceOf(uri) ?? (await this.plainSourceOf(uri));
+  }
+
+  /**
+   * A Markdown file as a plain link source, if it lies in a trusted workspace folder on disk. The
+   * folder is listed on first use and again after a Markdown file was created, deleted, or
+   * changed; `.git` and `node_modules` are skipped and the listing limit applies, as for pages.
+   */
+  private async plainSourceOf(uri: vscode.Uri): Promise<SourcePage | undefined> {
+    const folder = vscode.workspace.getWorkspaceFolder(uri);
+    if (!folder || !this.registry.trusted || uri.scheme !== "file") {
+      return undefined;
+    }
+    const path = pathInside(folder.uri, uri);
+    if (!path) {
+      return undefined;
+    }
+    const key = folder.uri.toString();
+    let plain = this.plainFolders.get(key);
+    if (!plain) {
+      const watcher = vscode.workspace.createFileSystemWatcher(
+        new vscode.RelativePattern(folder, "**/*.{md,MD}"),
+      );
+      const created: PlainFolder = { cache: new Map(), watcher };
+      const forget = (): void => {
+        delete created.pages;
+      };
+      watcher.onDidCreate(forget);
+      watcher.onDidDelete(forget);
+      watcher.onDidChange(forget);
+      this.plainFolders.set(key, created);
+      plain = created;
+    }
+    plain.pages ??= scanPages({
+      workspaceRoot: folder.uri.fsPath,
+      contentRoot: ".",
+      scope: PLAIN_SCOPE,
+      cache: plain.cache,
+    }).then((scan) => (scan.ok ? scan.pages : []));
+    return { uri, path, root: folder.uri, pages: await plain.pages, slugify: "ascii" };
+  }
 
   /** The page `uri` as a link source, if it lies in the content root of a ready folder. */
   sourceOf(uri: vscode.Uri): SourcePage | undefined {
@@ -71,8 +139,12 @@ export class LinkService {
    * Completion items for a link destination in `uri`: pages with their title and aliases, or the
    * anchors of one page with their heading text. Unfiltered; callers match the typed text.
    */
-  async completions(uri: vscode.Uri, anchorsOf?: string): Promise<CompletionItem[]> {
-    const source = this.sourceOf(uri);
+  async completions(
+    uri: vscode.Uri,
+    anchorsOf?: string,
+    options: { readonly plain?: boolean } = {},
+  ): Promise<CompletionItem[]> {
+    const source = options.plain ? await this.sourceOrPlain(uri) : this.sourceOf(uri);
     if (!source) {
       return [];
     }
@@ -119,8 +191,12 @@ export class LinkService {
    * Insert Link: the author searches a page by title, path, or alias, optionally picks one of its
    * headings, and confirms the display text. `undefined` when cancelled or not a page.
    */
-  async pick(uri: vscode.Uri, selection: string): Promise<ChosenLink | undefined> {
-    const source = this.sourceOf(uri);
+  async pick(
+    uri: vscode.Uri,
+    selection: string,
+    options: { readonly plain?: boolean } = {},
+  ): Promise<ChosenLink | undefined> {
+    const source = options.plain ? await this.sourceOrPlain(uri) : this.sourceOf(uri);
     if (!source) {
       void vscode.window.showWarningMessage(this.translate("links.notAPage"));
       return undefined;
