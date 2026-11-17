@@ -17,6 +17,8 @@ import type { FolderModel, FolderRegistry } from "../folders/folder-registry";
 
 export const PAGES_VIEW_ID = "lorequill.pages";
 export const OPEN_PROFILE_COMMAND = "lorequill.openProfile";
+/** Where a folder without a profile learns how to create one. */
+const GETTING_STARTED_URL = "https://lorequill.potamico.org/getting-started/";
 
 /** Elements of the Pages tree. */
 export type PagesElement =
@@ -115,7 +117,9 @@ export class PagesTreeProvider implements vscode.TreeDataProvider<PagesElement>,
     const translate = this.translate;
     if (model.status.kind !== "ready") {
       const description = describeStatus(model.status, translate);
-      return [{ kind: "message", model, text: description.message, status: "error" }];
+      // A folder without a profile is not broken: its Markdown files open in the editor.
+      const status = model.status.kind === "profile-missing" ? "info" : "error";
+      return [{ kind: "message", model, text: description.message, status }];
     }
     const view = this.viewOf(model);
     if (directory) {
@@ -213,6 +217,12 @@ export class PagesTreeProvider implements vscode.TreeDataProvider<PagesElement>,
           command: OPEN_PROFILE_COMMAND,
           title: translate("action.openProfile"),
           arguments: [model.folder.uri, description.profileLine],
+        };
+      } else if (model.status.kind === "profile-missing") {
+        item.command = {
+          command: "vscode.open",
+          title: translate("action.gettingStarted"),
+          arguments: [vscode.Uri.parse(GETTING_STARTED_URL)],
         };
       }
     } else if (element.detail !== undefined) {

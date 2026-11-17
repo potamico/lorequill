@@ -53,12 +53,17 @@ export function registerEditor(
     translate,
     (uri) => contentRootOf(registry, uri),
     links,
+    (uri) => isManaged(registry, uri),
   );
   const outline = new OutlineTreeProvider(pageEditor);
 
   subscriptions.push(
     pageEditor,
     outline,
+    links,
+    registry.onDidChange(() => {
+      pageEditor.refreshContext();
+    }),
     vscode.window.registerCustomEditorProvider(PAGE_EDITOR_VIEW_TYPE, pageEditor, {
       supportsMultipleEditorsPerDocument: true,
     }),
@@ -101,6 +106,18 @@ function contentRootOf(registry: FolderRegistry, uri: vscode.Uri): vscode.Uri | 
     .models()
     .map(({ contentRoot }) => contentRoot)
     .find((root) => root !== undefined && pathInside(root, uri) !== undefined);
+}
+
+/**
+ * Whether a file belongs to a workspace folder with a ready profile. Its editor then offers Check
+ * Pages, Commit, and Submit for Review, which act on the folder's repository.
+ */
+function isManaged(registry: FolderRegistry, uri: vscode.Uri): boolean {
+  return registry
+    .models()
+    .some(
+      ({ folder, status }) => status.kind === "ready" && pathInside(folder.uri, uri) !== undefined,
+    );
 }
 
 /** Opens a page in the Lorequill editor, or as text with `viewType` `default`. */

@@ -7,6 +7,23 @@ the check engine, the CLI, and the GitHub Action. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- The page editor works without a profile: **Open in Lorequill Editor** in the Explorer context
+  menu and the command palette opens any Markdown file with the editor, Outline, Properties, and
+  link completion for the Markdown files of the folder. Pages, checks, Commit, and Submit for
+  Review still need a profile and no longer appear without one.
+
+### Changed
+
+- The Pages view of a folder without a profile explains what a profile adds and links to the
+  getting-started page, instead of showing a warning.
+- The preview of a Markdown file outside the content root shows images from its workspace folder.
+
+### Fixed
+
+- Deleting or renaming the `.lorequill` directory as a whole is noticed like deleting the profile.
+
 ## [0.3.1] - 2026-11-17
 
 ### Changed

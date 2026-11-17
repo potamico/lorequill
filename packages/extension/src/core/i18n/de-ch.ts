@@ -6,7 +6,7 @@ import type { Catalog } from "./en";
  */
 export const deCH: Catalog = {
   "folder.profileMissing":
-    "Unter .lorequill/config.yaml wurde kein Profil gefunden. Die verwaltete Bearbeitung ist für diesen Ordner deaktiviert.",
+    "Unter .lorequill/config.yaml wurde kein Profil gefunden. Der Editor funktioniert mit jeder Markdown-Datei; ein Profil ergänzt Seiten, Prüfungen und Review.",
   "folder.profileUnsupported":
     "Die Profilversion {found} wird nicht unterstützt; diese Lorequill-Version unterstützt Version {supported}. Die verwaltete Bearbeitung ist für diesen Ordner deaktiviert.",
   "folder.profileInvalid":
@@ -39,6 +39,7 @@ export const deCH: Catalog = {
   "pages.filterActive": "Filter: {filter}",
 
   "action.openProfile": "Profil öffnen",
+  "action.gettingStarted": "«Getting started» öffnen",
   "action.openPage": "Seite öffnen",
 
   "profile.problemAtLine": "Zeile {line}: {message}",

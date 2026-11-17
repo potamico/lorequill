@@ -52,10 +52,12 @@ describe("classifyProfileResult", () => {
 });
 
 describe("describeStatus", () => {
-  it("explains a missing profile and disabled editing", () => {
+  it("explains a missing profile and what a profile adds", () => {
     const message = describeStatus(notReady({ kind: "profile-missing" }), translate);
     expect(message.message).toContain(".lorequill/config.yaml");
-    expect(message.message).toContain("Managed editing is disabled");
+    // Not an error: the editor works without a profile (#10).
+    expect(message.message).toContain("The editor works on any Markdown file");
+    expect(message.message).toContain("a profile adds pages, checks, and review");
     expect(message.canOpenProfile).toBe(false);
   });
 

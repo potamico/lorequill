@@ -24,6 +24,8 @@ In an untrusted workspace, Lorequill only explains what it would do.
 ## Requirements
 
 - VS Code 1.110 or newer, Git, and a local clone with `.lorequill/config.yaml`.
+- The editor alone needs no profile: right-click a `.md` file in the Explorer and choose **Open in
+  Lorequill Editor**.
 - For **Submit for review**: a GitHub repository (github.com or GitHub Enterprise Server) and the
   VS Code GitHub sign-in.
 

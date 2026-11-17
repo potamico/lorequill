@@ -106,7 +106,20 @@ export function activate(context: vscode.ExtensionContext): LorequillInternalApi
   server.register(subscriptions);
   registry.start();
   git.start();
-  void vscode.commands.executeCommand("setContext", "lorequill.enabled", true);
+  // `lorequill.active` shows the views once the extension runs, also for plain Markdown files
+  // without a profile. `lorequill.enabled` adds what needs a profile: New Page, Check Pages, and
+  // the Git actions. An untrusted workspace is not read, so it counts as having a profile and
+  // keeps its explanatory views.
+  const showEnabled = (): void => {
+    void vscode.commands.executeCommand(
+      "setContext",
+      "lorequill.enabled",
+      !registry.trusted || registry.hasProfile(),
+    );
+  };
+  subscriptions.push(registry.onDidChange(showEnabled));
+  showEnabled();
+  void vscode.commands.executeCommand("setContext", "lorequill.active", true);
 
   if (context.extensionMode !== vscode.ExtensionMode.Test) {
     return undefined;

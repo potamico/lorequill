@@ -294,11 +294,15 @@ suite("Page editor", () => {
     assert.equal(document.isDirty, false);
   });
 
-  test("leaves the page location out for Markdown outside the content root", async () => {
+  test("places Markdown outside the content root in its workspace folder", async () => {
+    // A plain file (#10): its preview loads images from the workspace folder, and since the
+    // folder has a profile, the toolbar keeps the folder's Check Pages, Commit, and Submit.
     const session = await openInPageEditor(api, fileUri("README.md"));
     const init = session.sent.find(({ type }) => type === "init");
-    assert.ok(init);
-    assert.equal((init as { page?: unknown }).page, undefined);
+    const page = (init as { page?: { path: string; resourceBase: string } } | undefined)?.page;
+    assert.equal(page?.path, "README.md");
+    const context = session.sent.filter(({ type }) => type === "context").at(-1);
+    assert.equal(context?.managed, true);
   });
 
   test("asks the webview for collected typing before saving", async () => {

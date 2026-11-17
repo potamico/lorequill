@@ -149,6 +149,13 @@ export type HostMessage =
   | { readonly type: "settings"; readonly settings: EditorSettings }
   | { readonly type: "diagnostics"; readonly diagnostics: readonly EditorDiagnostic[] }
   | { readonly type: "command"; readonly command: EditorCommand }
+  /**
+   * Where the page stands, sent after `init` and whenever it changes (a profile was added,
+   * fixed, or removed). `managed`: the page belongs to a folder with a ready profile; only then
+   * the toolbar offers Check Pages, Commit, and Submit for Review, and a plain Markdown file gets
+   * the editor alone. `page`: as in `init`. The webview assumes a plain file until told.
+   */
+  | { readonly type: "context"; readonly managed: boolean; readonly page?: PageLocation }
   /** Moves the cursor to the start of `line` and scrolls it to the top (outline navigation). */
   | { readonly type: "reveal"; readonly line: number }
   /** Send collected changes now and answer `flushed` with the same token (before save, undo). */
@@ -518,6 +525,16 @@ export function parseHostMessage(value: unknown): HostMessage | undefined {
         value.items.length <= LIMITS.maxCompletions &&
         value.items.every(isCompletionItem)
         ? { type: "completions", id: value.id, items: value.items }
+        : undefined;
+    case "context":
+      return hasOnlyKeys(value, ["type", "managed", "page"]) &&
+        typeof value.managed === "boolean" &&
+        (value.page === undefined || isPageLocation(value.page))
+        ? {
+            type: "context",
+            managed: value.managed,
+            ...(value.page === undefined ? {} : { page: value.page }),
+          }
         : undefined;
     case "command":
       return hasOnlyKeys(value, ["type", "command"]) &&

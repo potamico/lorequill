@@ -167,7 +167,12 @@ export function cellInput(target: Page): Locator {
  * webview context menu or the command palette.
  */
 export async function runCommand(target: Page, command: string): Promise<void> {
-  await target.evaluate((name) => {
-    (globalThis as unknown as PageGlobals).postMessage({ type: "command", command: name }, "*");
-  }, command);
+  await sendToEditor(target, { type: "command", command });
+}
+
+/** Sends a host message to the editor, as the extension does. */
+export async function sendToEditor(target: Page, message: Record<string, unknown>): Promise<void> {
+  await target.evaluate((data) => {
+    (globalThis as unknown as PageGlobals).postMessage(data, "*");
+  }, message);
 }

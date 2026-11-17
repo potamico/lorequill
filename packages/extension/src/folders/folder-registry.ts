@@ -84,6 +84,16 @@ export class FolderRegistry implements vscode.Disposable {
     });
   }
 
+  /**
+   * Whether a workspace folder has a profile file, valid or not. Then the Pages view, the checks,
+   * and the Git actions concern the workspace; without one, Lorequill is only its editor.
+   */
+  hasProfile(): boolean {
+    return this.models().some(
+      ({ status }) => status.kind !== "profile-missing" && status.kind !== "unsupported-location",
+    );
+  }
+
   /** Number of folders whose profile has been read. Zero for every folder while untrusted. */
   loadedFolderCount(): number {
     return [...this.entries.values()].filter((entry) => entry.model !== undefined).length;
@@ -172,8 +182,10 @@ export class FolderRegistry implements vscode.Disposable {
     if (entry.disposables.length > 0) {
       return;
     }
+    // The directory is watched too: deleting or renaming `.lorequill` as a whole reports only
+    // the directory, not the profile inside it.
     const watcher = vscode.workspace.createFileSystemWatcher(
-      new vscode.RelativePattern(entry.folder, ".lorequill/config.yaml"),
+      new vscode.RelativePattern(entry.folder, "{.lorequill,.lorequill/config.yaml}"),
     );
     const refresh = (): void => {
       this.schedule(entry, REFRESH_DELAY_MS);

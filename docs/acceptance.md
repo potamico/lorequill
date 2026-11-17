@@ -5,7 +5,8 @@ tests run with `npm run test:unit`, extension host tests with `npm run test:inte
 in brackets), and the GitHub end-to-end test with `npm run test:e2e:github`. CI runs all but the
 GitHub end-to-end test on every pull request.
 
-Paths are relative to `packages/`; `u:` is `test/unit/`, `i:` is `test/integration/suite/`.
+Paths are relative to `packages/`; `u:` is `test/unit/`, `i:` is `test/integration/suite/`,
+`w:` is `test/webview/`.
 
 ## MVP acceptance scenario (§17)
 
@@ -99,6 +100,7 @@ a disposable GitHub repository (AT 41).
 | 61  | `markdown/u:links.test.ts` (containers); `checks/u:relative-links.test.ts` (links in Material containers); `editor/u:admonition-syntax.test.ts`                                                                                                                                         |
 | 62  | `extension/i:multi-root/multi-root.test.ts` (display language); `extension/i:editor/page-editor.test.ts` (toolbar labels); `extension/u:i18n.test.ts`                                                                                                                                   |
 | 63  | `extension/i:editor/page-editor.test.ts` (option, not default; switching editors); `extension/i:trusted/pages-tree.test.ts` (opens in the Lorequill editor)                                                                                                                             |
+| 64  | `extension/i:plain/plain-editing.test.ts` (activation, context, Pages message, links, Properties, profile added and removed); `extension/w:toolbar.spec.ts` (toolbar); `extension/u:manifest.test.ts` (menus and context keys)                                                          |
 
 ## Security review
 

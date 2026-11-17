@@ -6,7 +6,7 @@
 export const en = {
   // Folder states shown in the Pages tree
   "folder.profileMissing":
-    "No profile found at .lorequill/config.yaml. Managed editing is disabled for this folder.",
+    "No profile found at .lorequill/config.yaml. The editor works on any Markdown file; a profile adds pages, checks, and review.",
   "folder.profileUnsupported":
     "Profile version {found} is not supported; this version of Lorequill supports version {supported}. Managed editing is disabled for this folder.",
   "folder.profileInvalid":
@@ -41,6 +41,7 @@ export const en = {
 
   // Actions
   "action.openProfile": "Open profile",
+  "action.gettingStarted": "Open Getting started",
   "action.openPage": "Open page",
 
   // Details of a profile problem

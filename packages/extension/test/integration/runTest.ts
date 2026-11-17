@@ -104,6 +104,7 @@ async function main(): Promise<void> {
     { name: "checks", workspace: workspaces.checks, trust: false },
     { name: "editor", workspace: workspaces.editor, trust: false },
     { name: "git", workspace: workspaces.git, trust: false },
+    { name: "plain", workspace: workspaces.plain, trust: false },
   ];
 
   // VS Code creates its IPC socket inside the user data directory. macOS allows at most 103
